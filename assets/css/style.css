@@ -851,6 +851,11 @@ h6 {
   background: #ffecdf;
 }
 
+.dashboard .almacenamiento-card .card-icon {
+  color: #198754;
+  background: #cfe2ff;
+}
+
 /* Activity */
 .dashboard .activity {
   font-size: 14px;

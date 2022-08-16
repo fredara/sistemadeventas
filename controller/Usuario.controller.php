@@ -63,6 +63,12 @@
             }
         break;
 
+        case "sc": 
+            $usu=new Usuario();
+            $log = new Log();	
+            header("Location:../index.php");
+        break;
+
         default:
             header("Location:../index.php");
 	    break; 
