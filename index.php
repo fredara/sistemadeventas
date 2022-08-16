@@ -1,3 +1,6 @@
+<?php
+  extract($_REQUEST);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,6 +58,14 @@
                   <span class="d-none d-lg-block"><strong>Recarval</strong></span>
                 </a>
               </div><!-- End Logo -->
+              <!-- Error -->
+              <?php if(!empty($err)){ ?> 
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php echo $err; ?> 
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              <?php } ?> 
+              <!-- End Error -->
 
               <div class="card mb-3 borderEspecial">
 
@@ -64,23 +75,24 @@
                     <h5 class="card-title text-center pb-0 fs-4"><strong> </strong></h5>
                   </div>
                     <!-- todos los form debe tener action method -->
-                  <form class="row g-3 needs-validation" novalidate   method="POST" action="./controller/Usuario.controller.php"  >
+                  <form class="row g-3 needs-validation" novalidate method="POST" action="./controller/Usuario.controller.php"  >
 
                   <!-- Cuando no tiene form(input) se trabaja con <a><a/> <a href="almacen.php">Ir a almacen</a> -->
                     <div class="col-12">
                       <div class="input-group has-validation">
-                        <input type="text" name="usuario" class="form-control" id="yourUsername" placeholder="Usuario" required>
+                        <input type="text" name="login_usuario" class="form-control" id="yourUsername" placeholder="Usuario" required>
                         <div class="invalid-feedback">Por Favor ingrese el usuario.</div>
                       </div>
                     </div>
 
                     <div class="col-12">
-                      <input type="password" name="clave" class="form-control" id="yourPassword" placeholder="Clave" required>
+                      <input type="password" name="clave_usuario" class="form-control" id="yourPassword" placeholder="Clave" required>
                       <div class="invalid-feedback">Por Favor Ingrese la Clave</div>
                     </div>
 
                     <div class="col-12">
                       <button class="botonIngresar-primary w-100 botonIngresar" type="submit">Entrar</button>
+                      <input type="hidden" name="operacion" id="operacion" value="is">
                     </div>
                   </form>
 
