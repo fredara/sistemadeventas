@@ -66,6 +66,7 @@
         case "sc": 
             $usu=new Usuario();
             $log = new Log();	
+            $usu->desconectarUsuario();
             header("Location:../index.php");
         break;
 

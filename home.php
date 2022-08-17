@@ -1,6 +1,6 @@
 <?php
   extract($_REQUEST);
-  require_once("inc/sesion.php");
+  require_once("./inc/sesion.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">

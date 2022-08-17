@@ -61,6 +61,14 @@
             return $err;
         }
 
+        function desconectarUsuario(){
+            session_start();
+            // Destruye todas las variables de la session
+            session_unset();	
+            // Finalmente, destruye la session	
+            session_destroy();
+        }
+
         function cryptPassword($password){
             $cryptPassword=md5($password);
             return $cryptPassword;
