@@ -134,6 +134,19 @@
 
 
   <main id="main" class="main">
+      <!-- Error -->
+        <?php if(!empty($err)){ ?> 
+          <div class="row mb-3">
+            <div class="col-sm-8">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                  <?php echo $err;  ?> 
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+          </div>
+        <?php } ?> 
+      <!-- End Error -->
+
 
     <div class="pagetitle">
       <h1>Registro de Producto</h1>
@@ -146,16 +159,25 @@
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
-        <form class="row g-3 needs-validation" novalidate action="#controller"  method="POST" enctype="multipart/form-data">
+        <form class="row g-3 needs-validation" novalidate action="./controller/Almacen.controller.php
+        "  method="POST" enctype="multipart/form-data">
+
         <div class="row mb-3">
-            <label for="codigo_producto" class="col-sm-2 col-form-label">C&oacute;digo Producto</label>
+          <div class="col-sm-6">
+            <span class="badge bg-danger">* Campos obligatorios</span>
+          </div>
+        </div>
+
+
+        <div class="row mb-3">
+            <label for="codigo_producto" class="col-sm-2 col-form-label">C&oacute;digo Producto <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
                 <input type="text" name="codigo_producto" id="codigo_producto" class="form-control" required>
             </div>
         </div>
       
         <div class="row mb-3">
-            <label for="nombre_producto" class="col-sm-2 col-form-label">Nombre</label>
+            <label for="nombre_producto" class="col-sm-2 col-form-label">Nombre <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
                 <input type="text" name="nombre_producto" id="nombre_producto" class="form-control" required>
             </div>
@@ -176,16 +198,23 @@
         </div>
 
         <div class="row mb-3">
-            <label for="formFile" class="col-sm-2 col-form-label">Subir Imagen</label>
+            <label for="archivo" class="col-sm-2 col-form-label">Subir Imagen</label>
             <div class="col-sm-6">
-            <input class="form-control" type="file" id="formFile" name="imagen_product">
+            <input class="form-control" type="file" id="archivo" name="archivo">
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="cantidad_inicial" class="col-sm-2 col-form-label">Existencia</label>
+            <label for="cantidad_inicial" class="col-sm-2 col-form-label">Existencia <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
             <input type="number" class="form-control" name="cantidad_inicial" id="cantidad_inicial" required>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="precio" class="col-sm-2 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">*</span></label>
+            <div class="col-sm-6">
+            <input type="number" class="form-control" name="precio" id="precio" required>
             </div>
         </div>
 
@@ -197,6 +226,7 @@
             <label class="col-sm-2 col-form-label"></label>
             <div class="col-sm-6">
                 <button type="submit" class="btn btn-primary">Registrar Producto</button>
+                <input type="hidden" name="operacion" id="operacion" value="cpro">
             </div>
         </div>
         </form>
