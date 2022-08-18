@@ -98,7 +98,7 @@
       <h1>Principal</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="home.php">Home</a></li>
           <li class="breadcrumb-item active">Principal</li>
         </ol>
       </nav>
@@ -122,7 +122,7 @@
                       <h6>Opciones</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Registrar</a></li>
+                    <li><a class="dropdown-item" href="registro_ventas.php">Registrar</a></li>
                     <li><a class="dropdown-item" href="#">Lista</a></li>
                   </ul>
                 </div>
@@ -191,8 +191,8 @@
                       <h6>Opciones</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Registrar</a></li>
-                    <li><a class="dropdown-item" href="#">Listado</a></li>
+                    <li><a class="dropdown-item" href="registrar_producto.php">Registrar</a></li>
+                    <li><a class="dropdown-item" href="listar_producto.php">Listado</a></li>
                   </ul>
                 </div>
 
