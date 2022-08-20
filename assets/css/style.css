@@ -46,6 +46,12 @@ h6 {
   transition: all 0.3s;
 }
 
+#main2 {
+  margin-top: 60px;
+  padding: 20px 30px;
+  transition: all 0.3s;
+}
+
 @media (max-width: 1199px) {
   #main {
     padding: 20px;
@@ -650,6 +656,11 @@ h6 {
   #main,
   #footer {
     margin-left: 300px;
+  }
+
+  #main2,
+  #footer2 {
+    margin-left: 0px !important;
   }
 }
 

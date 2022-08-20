@@ -53,8 +53,9 @@
                         $fecha_hora=date("Y-m-d H:i:s");
                         $ip=$uti->getIP();
                         $log->addLog($_SESSION['cod_usuario_log'], $descripcion, $fecha_hora, $ip, 'Almacen - Productos');
-                        
-                        header("Location:../lista_productos.php");
+                        $err="Se ha Creado el Producto Exitosamente";
+                        $tp="e";
+                        header("Location:../lista_productos.php?err=$err&tp=$tp");
                         break;
                     }
                 }

@@ -192,11 +192,11 @@
                     </li>
 
                     <li><a class="dropdown-item" href="registrar_producto.php">Registrar</a></li>
-                    <li><a class="dropdown-item" href="listar_producto.php">Listado</a></li>
+                    <li><a class="dropdown-item" href="lista_productos.php">Listado</a></li>
                   </ul>
                 </div>
 
-                <div class="card-body">
+                <a class="dropdown-item d-flex align-items-center" data-bs-toggle="dropdown" href="#"><div class="card-body">
                   <h5 class="card-title"></h5>
 
                   <div class="d-flex align-items-center">
@@ -210,7 +210,7 @@
                     </div>
                   </div>
 
-                </div>
+                </div></a>
               </div>
 
             </div><!-- End Customers Card -->
