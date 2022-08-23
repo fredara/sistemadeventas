@@ -1274,3 +1274,11 @@ h6 {
   font-size: 13px;
   color: #012970;
 }
+
+
+.centrar1{
+  position: absolute;
+  right: 50%;
+  top: 50% !important;
+}
+

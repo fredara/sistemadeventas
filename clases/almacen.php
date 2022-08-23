@@ -31,14 +31,14 @@
 			return $err;
 		}
 
-		function listarProductos($pag, $regxpag){
+	function listarProductos($pag, $regxpag){
 			if (empty($pag)) $pag=1;
 			if (empty($regxpag)) $regxpag=15;
 			$inic = ($pag * $regxpag) - $regxpag;
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			@mysqli_select_db($con,$this->vardb);	
 			mysqli_set_charset($con, "utf8");
-			$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario)  ORDER BY t1.nombre_producto asc LIMIT $inic, $regxpag";
+			$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario)  ORDER BY t1.cod_producto desc LIMIT $inic, $regxpag";
 			$rs=@mysqli_query($con,$query);
 			if (@mysqli_num_rows($rs)){
 			$query="SELECT FOUND_ROWS()";
@@ -52,9 +52,13 @@
 			$this->primero = $inic + 1;
 			$this->ultimo=$inic + $regxpag;
 			
-			if ($this->total < $this->ultimo) $this->ultimo=$this->total;
-			}
+			if ($this->total < $this->ultimo)
+			    $this->ultimo=$this->total;
 		}
+		
+		@mysqli_close($con);
+		return $return;
+	}
 
 		//funcion para las fechas seleccionadas con calendarios
 		function FechaOriginal($fecha) {

@@ -8,14 +8,13 @@ $alm = new Almacen();
 $objProductos= $alm->listarProductos($pag, $regxpag);
 $total_paginas=ceil($alm->total/$regxpag);
 
-print_r($objProductos);
-
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Sistema de Ventas</title>
@@ -134,11 +133,11 @@ print_r($objProductos);
 
 
     <div class="pagetitle">
-      <h1>Lista de Producto</h1>
+      <h1>Lista de Productos</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active">Lista de Producto</li>
+          <li class="breadcrumb-item active">Lista de Productos</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -148,44 +147,94 @@ print_r($objProductos);
             <div class="col-lg-12">
                 <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Table with stripped rows</h5>
 
                     <!-- Table with stripped rows -->
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">C&oacute;digo Producto</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Marca</th>
-                        <th scope="col">Existencia</th>
+                        <th style="width: 5%; text-align: center;"># Item</th>
+                        <th style="width: 20%; text-align: center;">C&oacute;digo Producto</th>
+                        <th style="width: 30%; text-align: center;">Nombre</th>
+                        <th style="width: 15%; text-align: center;">Marca</th>
+                        <th style="width: 5%; text-align: center;">Existencia</th>
+                        <th style="width: 10%; text-align: center;">Precio</th>
+                        <th style="width: 5%; text-align: center;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php 
-                        $objProductos= $alm->listarProductos($pag, $regxpag);
                         if(!empty($objProductos)) {
-				            foreach ($objProductos as $obj) {
-                                echo "asdadasd;";
+				                  foreach ($objProductos as $obj) {
                     ?>
                         <tr>
                             <th scope="row"> <?php echo $obj->cod_producto; ?></th>
-                            <td><?php echo $obj->codigo_producto; ?></td>
-                            <td><?php echo $obj->nombre_producto; ?></td>
-                            <td><?php echo $obj->marca; ?></td>
-                            <td><?php echo $obj->existencia; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->codigo_producto; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->nombre_producto; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->marca; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->cantidad; ?></td>
+                            <td style="text-align: center;"><?php echo @number_format($obj->precio, 1, ',', '.'); echo " $"; ?></td>
+                            <td style="text-align: center;">
+                              <div class="card almacenamiento-card">
+                                <div class="filter centrar1">
+                                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                                    <li class="dropdown-header text-start">
+                                      <h6>Opciones</h6>
+                                    </li>
+
+                                    <li><?php echo "<a class='dropdown-item' href='modificar_producto.php?cod_producto=".$obj->cod_producto."'>Actualizar</a>"; ?></li>
+                                    <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
+                                    <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </td>
                         </tr>
                     <?php
-				            }
-				        }
+				                }
+				              }
                     ?>
-                      
                     </tbody>
                     </table>
-                    <!-- End Table with stripped rows -->
+                    <?php 
+                      if ($total_paginas) { 
+                        $display_pages=5;
+                    ?>
+                        <nav aria-label="Page navigation example" class="d-flex align-items-center justify-content-center">
+                          <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="lista_productos.php?pag=1" title='Ir a Inicio de la Lista'>Primero</a></li>
+                            <?php if ($pag>1) echo "<li class='page-item'><a class='page-link' href='lista_productos.php?pag=".($pag-1)."'>Anterior</a></li>";
+
+                                for ($i = $pag; $i <= $total_paginas && $i<=($pag+$display_pages); $i++) {
+                                  if ($i == $pag) echo "<strong class='page-link'>$i - </strong>";//not printing the link
+                                  else echo " <li class='page-item'><a class='page-link' href='lista_productos.php?pag=$i' title='page $i'>$i</a></li> - ";//link
+                                }
+
+                                if (($pag+$display_pages)< $total_paginas) echo "..."; //etcetera...
+                                if ($pag<$total_paginas) echo " <a class='page-link' title='Next' href='lista_productos.php?pag=".($pag+1)."'> Pr&oacute;ximo >></a> ";//Next
+                                echo "<a class='page-link' title='Ultima Pagina' href='lista_productos.php?pag=$total_paginas'>&Uacute;ltimo >></a> ";
+                            ?>
+                          </ul>
+                        </nav>
+                    <?php 
+                      } 
+                    ?>
+
+                    <span class="d-flex align-items-center justify-content-center pagination">
+                      <label class="page-link">
+                        <?php 
+                          if (!empty($objProductos)) {
+                            echo $alm->primero?>
+                            -<?php echo $alm->ultimo?> de <?php echo $alm->total; 
+                          } 
+                        ?>
+                      </label>
+                    </span>
 
                 </div>
                 </div>
+
+                
             </div>
         </div>
     </section>
