@@ -1,6 +1,9 @@
 <?php
   extract($_REQUEST);
   require_once("./inc/sesion.php");
+  require_once("./clases/almacen.php");
+  $alm = new Almacen();
+  $alm->getProducto($cod_producto);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -149,12 +152,14 @@
 
 
     <div class="pagetitle">
-      <h1>Registro de Producto</h1>
+      <h1>Actualizar Producto</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registro de Producto</a></li>
+          <li class="breadcrumb-item"><a href="lista_productos.php">Lista Productos</a></li>
+          <li class="breadcrumb-item active"><a href="modificar_producto.php">Actualizar Producto</a></li>
         </ol>
+
       </nav>
     </div><!-- End Page Title -->
 
@@ -172,50 +177,60 @@
         <div class="row mb-3">
             <label for="codigo_producto" class="col-sm-2 col-form-label">C&oacute;digo Producto <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-                <input type="text" name="codigo_producto" id="codigo_producto" class="form-control" required>
+                <input type="text" name="codigo_producto" id="codigo_producto" class="form-control" value="<?php echo $alm->codigo_producto; ?>" required>
             </div>
         </div>
       
         <div class="row mb-3">
             <label for="nombre_producto" class="col-sm-2 col-form-label">Nombre <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-                <input type="text" name="nombre_producto" id="nombre_producto" class="form-control" required>
+                <input type="text" name="nombre_producto" id="nombre_producto" class="form-control" value="<?php echo $alm->nombre_producto; ?>" required>
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="descripcion" class="col-sm-2 col-form-label">Descripci&oacute;n</label>
             <div class="col-sm-6">
-                <input type="text" name="descripcion" id="descripcion" class="form-control">
+                <input type="text" name="descripcion" id="descripcion" class="form-control" value="<?php echo $alm->descripcion; ?>">
             </div>
         </div>
 
         <div class="row mb-3">
             <label for="marca" class="col-sm-2 col-form-label">Marca</label>
             <div class="col-sm-6">
-                <input type="text" name="marca" id="marca" class="form-control">
+                <input type="text" name="marca" id="marca" class="form-control" value="<?php echo $alm->marca; ?>">
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Subir Imagen</label>
+            <label for="archivo" class="col-sm-2 col-form-label">Actualizar Foto:</label>
             <div class="col-sm-6">
             <input class="form-control" type="file" id="archivo" name="archivo">
             </div>
         </div>
-
         <div class="row mb-3">
-            <label for="cantidad_inicial" class="col-sm-2 col-form-label">Existencia <span class="badge border-danger border-1 text-danger">*</span></label>
+            <label for="archivo" class="col-sm-2 col-form-label">Foto</label>
             <div class="col-sm-6">
-            <input type="number" class="form-control" name="cantidad_inicial" id="cantidad_inicial" required>
+              <?php
+                if (!empty($alm->nombre_archivo)) { 
+              ?>
+                  <img src="images/productos/<?php echo $alm->nombre_archivo;?>" width="250" hspace="0" vspace="0" alt="Foto Producto">
+              <?php }else{ ?>
+                  <img src="images/productos/sinfoto.jpg" width="90" hspace="0" vspace="0"/>
+              <?php } ?>
             </div>
         </div>
 
         <div class="row mb-3">
-            <label for="precio" class="col-sm-2 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-            <input type="number" class="form-control" name="precio" id="precio" required>
-            </div>
+            <label for="cantidad_inicial" class="col-sm-8 col-form-label">Existencia <span class="badge border-danger border-1 text-danger">(Solo por Ajustes)</span> <strong><?php echo $alm->existencia; ?></strong></label>
+        </div>
+
+        <div class="row mb-3">
+            <label for="precio" class="col-sm-8 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">(Se Cambia por Precios)</span>  <strong><?php echo @number_format($alm->precio, 1, ',', '.'); echo " $"; ?></strong></label>
+        </div>
+
+        <div class="row mb-3">
+            <label for="precio" class="col-sm-8 col-form-label">Registrado Por: <strong><?php echo $alm->nombre_creo; echo " "; echo $alm->apellido_creo; ?></strong></label>
         </div>
 
 
@@ -225,8 +240,10 @@
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label"></label>
             <div class="col-sm-6">
-                <button type="submit" class="btn btn-primary">Registrar Producto</button>
-                <input type="hidden" name="operacion" id="operacion" value="cpro">
+                <button type="submit" class="btn btn-primary">Actualizar Producto</button>
+                <input type="hidden" name="operacion" id="operacion" value="mod_pro">
+                <input type="hidden" name="cod_producto" id="cod_producto" value="<?php echo $cod_producto; ?>">
+                
             </div>
         </div>
         </form>

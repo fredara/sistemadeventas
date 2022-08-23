@@ -137,7 +137,10 @@ $total_paginas=ceil($alm->total/$regxpag);
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active">Lista de Productos</li>
+          <li class="breadcrumb-item active"><a href="lista_productos.php">Lista de Productos</a></li>
+        </ol>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto</a></li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -181,10 +184,13 @@ $total_paginas=ceil($alm->total/$regxpag);
                                     <li class="dropdown-header text-start">
                                       <h6>Opciones</h6>
                                     </li>
+                                    <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
 
                                     <li><?php echo "<a class='dropdown-item' href='modificar_producto.php?cod_producto=".$obj->cod_producto."'>Actualizar</a>"; ?></li>
-                                    <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
+                                    
                                     <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
+
+                                    <li><?php echo "<a class='dropdown-item' href='precio_prodcuto.php?cod_producto=".$obj->cod_producto."'>Precio</a>"; ?></li>
                                   </ul>
                                 </div>
                               </div>

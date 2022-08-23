@@ -30,6 +30,53 @@ class Archivo{
 		return $err;
 	} 
 
+	function elimFotoPro($cod_pro){
+		$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+		mysqli_set_charset($con, "utf8");
+		@mysqli_select_db($con,$this->vardb);	
+		$query="select cod_foto from tbl_foto_producto where cod_foto='$cod_pro' and tipo_archivo='i'";
+		$rs=@mysqli_query($con,$query);
+		if (@mysqli_num_rows($rs)){
+			while($obj = @mysqli_fetch_object($rs)) {
+				   $this->delArchivo($obj->cod_foto);
+			}
+			$return = "OK";
+		}else{
+			$return = "X";
+		}
+		@mysqli_close($con);
+		return $return;
+	}
+
+	function delArchivo($cod_foto){
+		$err="OK";
+		$query="select directorio_archivo, nombre_archivo from tbl_foto_producto where cod_foto='$cod_foto'";
+		$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+		mysqli_set_charset($con, "utf8");
+		@mysqli_select_db($con,$this->vardb);
+		$rs=@mysqli_query($con,$query);
+		// tomo los datos del archivo id
+		if (@mysqli_num_rows($rs)>0){
+			$this->directorio_archivo=$this->mysqli_result($rs,0,'directorio_archivo');
+			$this->nombre_archivo=$this->mysqli_result($rs,0,'nombre_archivo');
+		}
+		// elimino el archivo del directorio
+		if ($handle=opendir("$this->directorio_archivo")){ 
+			@unlink("$this->directorio_archivo/$this->nombre_archivo");
+			@unlink("$this->directorio_archivo/mini/$this->nombre_archivo");
+			@closedir($handle); 
+		}
+		// elimino el archivo de la BD
+		$query="delete from tbl_foto_producto where cod_foto=$cod_foto";
+		//echo $query;
+		$rs=@mysqli_query($con,$query);
+		
+		if ($rs) {}
+		else { $err="X"; }
+		@mysqli_close($con);
+		return $err;
+	}
+
     function mkdir_r($dirName, $rights=0755){
 	  
 		$dirs = explode('/', $dirName);
