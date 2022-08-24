@@ -5,8 +5,10 @@ require_once("./clases/almacen.php");
 if (empty($regxpag))  $regxpag=30;
 if (empty($pag)) $pag=1;
 $alm = new Almacen();
-$objProductos= $alm->listarProductos($pag, $regxpag);
+$objPrecios= $alm->listarPreciosHistorico($cod_producto, $pag, $regxpag);
 $total_paginas=ceil($alm->total/$regxpag);
+
+$alm->getProducto($cod_producto);
 
 ?>
 <!DOCTYPE html PUBLIC>
@@ -133,17 +135,25 @@ $total_paginas=ceil($alm->total/$regxpag);
 
 
     <div class="pagetitle">
-      <h1>Lista de Productos</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active"><a href="lista_productos.php">Lista de Productos</a></li>
-        </ol>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto</a></li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+        <h1>Historico de Precio</h1>
+        <nav>
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="lista_productos.php">Lista Productos</a></li>
+            <li class="breadcrumb-item active"><a href="precio_producto.php?cod_producto=<?php echo $cod_producto; ?>">Precio Producto</a></li>
+            <li class="breadcrumb-item active"><a href="precio_producto_historico.php?cod_producto=<?php echo $cod_producto; ?>">Historico Precio</a></li>
+            </ol>
+
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><h3 class="card-title"><strong>Producto: </strong> <?php echo $alm->codigo_producto; ?> <?php echo $alm->nombre_producto; ?> <?php echo $alm->marca; ?></h3></li>
+            </ol>
+
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><span class="card-title"><strong>Precio Actual: </strong> <?php echo @number_format($alm->precio, 1, ',', '.'); echo " $"; ?></span></li>
+            </ol>
+
+        </nav>
+    </div>
 
     <section class="section dashboard">
         <div class="row mb-3">
@@ -155,81 +165,34 @@ $total_paginas=ceil($alm->total/$regxpag);
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th style="width: 5%; text-align: center;"># Item</th>
-                        <th style="width: 20%; text-align: center;">C&oacute;digo Producto</th>
-                        <th style="width: 30%; text-align: center;">Nombre</th>
-                        <th style="width: 15%; text-align: center;">Marca</th>
-                        <th style="width: 5%; text-align: center;">Existencia</th>
-                        <th style="width: 10%; text-align: center;">Precio</th>
-                        <th style="width: 5%; text-align: center;">&nbsp;</th>
+                        <th style="width: 5%; text-align: center;">Fecha Ajuste</th>
+                        <th style="width: 30%; text-align: center;">Precio</th>
+                        <th style="width: 15%; text-align: center;">Registrado Por</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php 
-                        if(!empty($objProductos)) {
-				                  foreach ($objProductos as $obj) {
+                        if(!empty($objPrecios)) {
+				            foreach ($objPrecios as $obj) {
                     ?>
                         <tr>
-                            <th scope="row"> <?php echo $obj->cod_producto; ?></th>
-                            <td style="text-align: center;"><?php echo $obj->codigo_producto; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->nombre_producto; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->marca; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->cantidad; ?></td>
-                            <td style="text-align: center;"><?php echo @number_format($obj->precio, 1, ',', '.'); echo " $"; ?></td>
-                            <td style="text-align: center;">
-                              <div class="card almacenamiento-card">
-                                <div class="filter centrar1">
-                                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                      <h6>Opciones</h6>
-                                    </li>
-                                    <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
-
-                                    <li><?php echo "<a class='dropdown-item' href='modificar_producto.php?cod_producto=".$obj->cod_producto."'>Actualizar</a>"; ?></li>
-                                    
-                                    <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
-
-                                    <li><?php echo "<a class='dropdown-item' href='precio_producto.php?cod_producto=".$obj->cod_producto."'>Precio</a>"; ?></li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </td>
+                            <th scope="row"> <?php echo $obj->fecha_reg; ?></th>
+                            <td style="text-align: center;"><?php echo @number_format($obj->precio, 1, ',', '.'); ?></td>
+                            <td style="text-align: center;"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
+                            
                         </tr>
                     <?php
-				                }
-				              }
+				            }
+				        }
                     ?>
                     </tbody>
                     </table>
-                    <?php 
-                      if ($total_paginas) { 
-                        $display_pages=5;
-                    ?>
-                        <nav aria-label="Page navigation example" class="d-flex align-items-center justify-content-center">
-                          <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="lista_productos.php?pag=1" title='Ir a Inicio de la Lista'>Primero</a></li>
-                            <?php if ($pag>1) echo "<li class='page-item'><a class='page-link' href='lista_productos.php?pag=".($pag-1)."'>Anterior</a></li>";
-
-                                for ($i = $pag; $i <= $total_paginas && $i<=($pag+$display_pages); $i++) {
-                                  if ($i == $pag) echo "<strong class='page-link'>$i - </strong>";//not printing the link
-                                  else echo " <li class='page-item'><a class='page-link' href='lista_productos.php?pag=$i' title='page $i'>$i</a></li> - ";//link
-                                }
-
-                                if (($pag+$display_pages)< $total_paginas) echo "..."; //etcetera...
-                                if ($pag<$total_paginas) echo " <a class='page-link' title='Next' href='lista_productos.php?pag=".($pag+1)."'> Pr&oacute;ximo >></a> ";//Next
-                                echo "<a class='page-link' title='Ultima Pagina' href='lista_productos.php?pag=$total_paginas'>&Uacute;ltimo >></a> ";
-                            ?>
-                          </ul>
-                        </nav>
-                    <?php 
-                      } 
-                    ?>
+                    
 
                     <span class="d-flex align-items-center justify-content-center pagination">
                       <label class="page-link">
                         <?php 
-                          if (!empty($objProductos)) {
+                          if (!empty($objPrecios)) {
                             echo $alm->primero?>
                             -<?php echo $alm->ultimo?> de <?php echo $alm->total; 
                           } 

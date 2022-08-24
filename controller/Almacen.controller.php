@@ -173,6 +173,28 @@
 
         break;
 
+        case "ajus_pre":
+            if (empty($cod_producto)) {
+                $err="Contacte al Administrador del sistema, Cod.1424";
+                header("Location:../lista_productos.php?err=$err");
+                break;
+            }
+            if (!empty($option)) {
+                if ($option=='Cambiar Precio') {
+                    header("Location:../precio_producto_crear.php?cod_producto=$cod_producto");
+                }else{
+                    header("Location:../precio_producto_historico.php?cod_producto=$cod_producto");
+                }
+            }else{
+                $err="Debe Seleccionar una Opcion válida";
+                header("Location:../precio_producto.php?err=$err&cod_producto=$cod_producto");
+                break;
+            }
+
+        break;
+
+        
+
         case "reg_ajuste":
             $log = new Log();
             $uti = new Utilidades();
@@ -209,6 +231,42 @@
             }
         break;
 
+
+        case "mod_precio":
+            if (empty($cod_producto)) {
+                $err="Contacte al Administrador del sistema, Cod.1424";
+                header("Location:../lista_productos.php?err=$err");
+                break;
+            }
+            if (!empty($precio)) {
+                $log = new Log();
+                $uti = new Utilidades();
+                $alm = new Almacen();
+                $alm->getProducto($cod_producto);
+
+                $error=$alm->addPrecio($cod_producto, $precio);
+                if ($error!='OK') {
+                    $err="No se pudo guardar la información del Ajuste, por favor contacte al administrador del sistema";
+                    header("Location:../ajuste_producto_registrar.php?cod_producto=$cod_producto&err=$err&pag=$pag");
+                } else {
+                    $alm->modPrecioProducto($cod_producto, $precio);
+
+                    // REGISTRO Log
+                    $descripcion="registró el Ajuste de precio del Producto $alm->nombre_producto precio $precio";
+                    $fecha_hora=date("Y-m-d H:i:s");
+                    $ip=$uti->getIP();
+                    $log->addLog($_SESSION['cod_usuario_log'], $descripcion, $fecha_hora, $ip, "Almacen");
+                    $err="El Precio del Producto se guardó de forma exitosa";
+                    header("Location:../precio_producto_historico.php?err=$err&pag=$pag&tp=e&cod_producto=$cod_producto");
+                }
+               
+            }else{
+                $err="Debe Ingresar el precio";
+                header("Location:../precio_producto_crear.php?err=$err&cod_producto=$cod_producto");
+                break;
+            }
+
+        break;
         default:
             header("Location:../index.php");
 	    break; 

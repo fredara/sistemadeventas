@@ -106,6 +106,22 @@
 			return $err;
 		}
 
+		function addPrecio($cod_producto, $precio) {
+			$err="OK";
+			$query="INSERT INTO tbl_producto_precios (cod_producto, precio, cod_usuario_creo, fecha_registro) values ('$cod_producto', '$precio', '".$_SESSION['cod_usuario_log']."', '".date('Y-m-d')."')";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			mysqli_set_charset($con, "utf8");
+			@mysqli_select_db($con,$this->vardb);
+			$rs=@mysqli_query($con,$query);
+			if ($rs) {
+				$this->cod_precio=@mysqli_insert_id($con);
+			}else {
+				$err='X';
+			}
+			@mysqli_close($con);
+			return $err;
+		}
+
 		function listarAjustesProd($cod_producto, $pag, $regxpag){
 			if (empty($pag)) $pag=1;
 			if (empty($regxpag)) $regxpag=15;
@@ -136,9 +152,51 @@
 			return $return;
 		}
 
+		function listarPreciosHistorico($cod_producto, $pag, $regxpag){
+			if (empty($pag)) $pag=1;
+			if (empty($regxpag)) $regxpag=15;
+			$inic = ($pag * $regxpag) - $regxpag;
+			$inic = ($pag * $regxpag) - $regxpag;
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			@mysqli_select_db($con,$this->vardb);	
+			mysqli_set_charset($con, "utf8");
+			$query="SELECT t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_reg, t2.nombre_usuario, t2.apellido_usuario FROM tbl_producto_precios t1 left join tbl_usuario t2 on (t1.cod_usuario_creo=t2.cod_usuario) WHERE t1.cod_producto='$cod_producto' ORDER BY t1.cod_precio DESC";
+			$rs=@mysqli_query($con,$query);
+			if (@mysqli_num_rows($rs)){
+				$query="SELECT FOUND_ROWS()";
+				$rss=@mysqli_query($con,$query);
+				$this->total=$this->mysqli_result($rss,0,'FOUND_ROWS()');
+				while($obj = @mysqli_fetch_object($rs)) {
+						$return[] = $obj;
+				}
+				$this->proximo = $pag + 1;
+				$this->anterior = $pag - 1;
+				$this->primero = $inic + 1;
+				$this->ultimo=$inic + $regxpag;
+				
+				if ($this->total < $this->ultimo)
+					$this->ultimo=$this->total;
+			}
+			
+			@mysqli_close($con);
+			return $return;
+		}
+
 		function modExistProducto($cod_producto, $cant_ajuste) {
 			$err="OK";
 			$query="UPDATE tbl_producto set cantidad='$cant_ajuste' WHERE cod_producto='$cod_producto'";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			@mysqli_select_db($con,$this->vardb);
+			$rs=@mysqli_query($con,$query);		
+			if ($rs) {}
+			else { $err='X'; }
+			@mysqli_close($con);
+			return $err;
+		}
+
+		function modPrecioProducto($cod_producto, $precio) {
+			$err="OK";
+			$query="UPDATE tbl_producto set precio='$precio' WHERE cod_producto='$cod_producto'";
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			@mysqli_select_db($con,$this->vardb);
 			$rs=@mysqli_query($con,$query);		
