@@ -152,65 +152,36 @@
 
 
     <div class="pagetitle">
-      <h1>Actualizar Producto</h1>
+      <h1>Ver Producto</h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
           <li class="breadcrumb-item"><a href="lista_productos.php">Lista Productos</a></li>
-          <li class="breadcrumb-item active"><a href="modificar_producto.php?cod_producto=<?php echo $cod_producto; ?>">Actualizar Producto</a></li>
+          <li class="breadcrumb-item active"><a href="ver_producto.php?cod_producto=<?php echo $cod_producto; ?>">Ver Producto</a></li>
         </ol>
 
       </nav>
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
-        <form class="row g-3 needs-validation" novalidate action="./controller/Almacen.controller.php
-        "  method="POST" enctype="multipart/form-data">
-
-        <div class="row mb-3" style="padding-top: 12px;">
-          <div class="col-sm-6">
-            <span class="badge bg-danger">* Campos obligatorios</span>
-          </div>
-        </div>
-
-
         <div class="row mb-3">
-            <label for="codigo_producto" class="col-sm-2 col-form-label">C&oacute;digo Producto <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-                <input type="text" name="codigo_producto" id="codigo_producto" class="form-control" value="<?php echo $alm->codigo_producto; ?>" required>
-            </div>
+            <label for="codigo_producto" class="col-sm-8 col-form-label">C&oacute;digo Producto: <strong><?php echo $alm->codigo_producto; ?></strong></label>
         </div>
       
         <div class="row mb-3">
-            <label for="nombre_producto" class="col-sm-2 col-form-label">Nombre <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-                <input type="text" name="nombre_producto" id="nombre_producto" class="form-control" value="<?php echo $alm->nombre_producto; ?>" required>
-            </div>
+            <label for="nombre_producto" class="col-sm-8 col-form-label">Nombre: <strong><?php echo $alm->nombre_producto; ?></strong></label>
         </div>
 
         <div class="row mb-3">
-            <label for="descripcion" class="col-sm-2 col-form-label">Descripci&oacute;n</label>
-            <div class="col-sm-6">
-                <input type="text" name="descripcion" id="descripcion" class="form-control" value="<?php echo $alm->descripcion; ?>">
-            </div>
+            <label for="descripcion" class="col-sm-8 col-form-label">Descripci&oacute;n: <strong><?php echo $alm->descripcion; ?></strong></label>
         </div>
 
         <div class="row mb-3">
-            <label for="marca" class="col-sm-2 col-form-label">Marca</label>
-            <div class="col-sm-6">
-                <input type="text" name="marca" id="marca" class="form-control" value="<?php echo $alm->marca; ?>">
-            </div>
+            <label for="marca" class="col-sm-8 col-form-label">Marca: <strong><?php echo $alm->marca; ?></strong></label>
         </div>
 
         <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Actualizar Foto:</label>
-            <div class="col-sm-6">
-            <input class="form-control" type="file" id="archivo" name="archivo">
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Foto</label>
-            <div class="col-sm-6">
+            <label for="archivo" class="col-sm-8 col-form-label">
               <?php
                 if (!empty($alm->nombre_archivo)) { 
               ?>
@@ -218,7 +189,7 @@
               <?php }else{ ?>
                   <img src="images/productos/sinfoto.jpg" width="90" hspace="0" vspace="0"/>
               <?php } ?>
-            </div>
+            </label>
         </div>
 
         <div class="row mb-3">
@@ -232,21 +203,6 @@
         <div class="row mb-3">
             <label for="precio" class="col-sm-8 col-form-label">Registrado Por: <strong><?php echo $alm->nombre_creo; echo " "; echo $alm->apellido_creo; ?></strong></label>
         </div>
-
-
-
-
-
-        <div class="row mb-3">
-            <label class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-6">
-                <button type="submit" class="btn btn-primary">Actualizar Producto</button>
-                <input type="hidden" name="operacion" id="operacion" value="mod_pro">
-                <input type="hidden" name="cod_producto" id="cod_producto" value="<?php echo $cod_producto; ?>">
-                
-            </div>
-        </div>
-        </form>
     </section>
 
   </main><!-- End #main -->

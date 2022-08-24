@@ -90,7 +90,7 @@ $total_paginas=ceil($alm->total/$regxpag);
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
             <li class="dropdown-header">
               <h6><?php echo $_SESSION['nombre_usuario_log']; ?> <?php echo $_SESSION['apellido_usuario_log']; ?></h6>
-              <span>Jefe del Sistema</span>
+              <span></span>
             </li>
             <li>
               <hr class="dropdown-divider">

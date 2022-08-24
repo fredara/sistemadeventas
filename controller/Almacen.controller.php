@@ -56,6 +56,11 @@
                         header("Location:../registrar_producto.php?err=$err");
                         break;
                     } else {
+                        //Historico de cantidades
+                        $fecha_hoy= date("d/m/Y");
+                        $alm->addAjusteProd($alm->cod_producto, $fecha_hoy, 'Incremento', $cantidad_inicial, 'Ajuste Inicial por Creacion del Producto');
+
+
                         // información del log
                         $descripcion="Se Registro un nuevo producto en el sistema $nombre_producto";
                         $fecha_hora=date("Y-m-d H:i:s");
@@ -145,6 +150,62 @@
             } else {
                 $err="No se pudo completar la operación, por favor completar toda la información requerida";
                 header("Location:../modificar_producto.php?err=$err&pag=$pag&cod_producto=$cod_producto");
+            }
+        break;
+
+        case "ajus_op":
+            if (empty($cod_producto)) {
+                $err="Contacte al Administrador del sistema, Cod.1424";
+                header("Location:../lista_productos.php?err=$err");
+                break;
+            }
+            if (!empty($option)) {
+                if ($option=='registrar') {
+                    header("Location:../ajuste_producto_registrar.php?cod_producto=$cod_producto");
+                }else{
+                    header("Location:../ajuste_producto_ver.php?cod_producto=$cod_producto");
+                }
+            }else{
+                $err="Debe Seleccionar una Opcion válida";
+                header("Location:../ajustar_producto.php?err=$err&cod_producto=$cod_producto");
+                break;
+            }
+
+        break;
+
+        case "reg_ajuste":
+            $log = new Log();
+            $uti = new Utilidades();
+            $alm = new Almacen();
+            $alm->getProducto($cod_producto);
+
+            $cant_actual = $alm->existencia;
+            if ($cant_actual<$cant_ajuste && $tipo_ajuste=='Decremento') {
+                $err="La cantidad a descontar del producto excede la existencia. Verifique e intente de nuevo";
+                header("Location:../ajuste_producto_registrar.php?cod_producto=$cod_producto&err=$err&pag=$pag");
+            } else {
+                if (!empty($fecha_ajuste) and !empty($tipo_ajuste) and !empty($cant_ajuste) and !empty($concepto_ajuste)) {
+                        $error=$alm->addAjusteProd($cod_producto, $fecha_ajuste, $tipo_ajuste, $cant_ajuste, $concepto_ajuste);
+                        if ($error!='OK') {
+                            $err="No se pudo guardar la información del Ajuste, por favor contacte al administrador del sistema";
+                            header("Location:../ajuste_producto_registrar.php?cod_producto=$cod_producto&err=$err&pag=$pag");
+                        } else {
+                            //modificar la existencia del producto de acuerdo al tipo de ajuste seleccionado
+                            if ($tipo_ajuste=='Incremento')		$cant_actual = $cant_actual+$cant_ajuste;
+                            if ($tipo_ajuste=='Decremento')		$cant_actual = $cant_actual-$cant_ajuste;
+                            $alm->modExistProducto($cod_producto, $cant_actual);
+                            // REGISTRO Log
+                            $descripcion="registró el Ajuste $alm->cod_ajuste del Producto $alm->nombre_producto $tipo_ajuste $cant_ajuste";
+                            $fecha_hora=date("Y-m-d H:i:s");
+                            $ip=$uti->getIP();
+                            $log->addLog($_SESSION['cod_usuario_log'], $descripcion, $fecha_hora, $ip, "Almacen");
+                            $err="El Ajuste del Producto se guardó de forma exitosa";
+                            header("Location:../ajuste_producto_ver.php?err=$err&pag=$pag&tp=e&cod_producto=$cod_producto");
+                        }
+                } else {
+                    $err="Todos los campos son obligatorios, por favor completar toda la información requerida";
+                    header("Location:../ajuste_producto_registrar.php?cod_producto=$cod_producto&err=$err&pag=$pag");
+                }
             }
         break;
 

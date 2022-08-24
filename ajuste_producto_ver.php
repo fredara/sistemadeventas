@@ -1,12 +1,22 @@
 <?php
-  extract($_REQUEST);
-  require_once("./inc/sesion.php");
+extract($_REQUEST);
+require_once("./inc/sesion.php");
+require_once("./clases/almacen.php");
+if (empty($regxpag))  $regxpag=30;
+if (empty($pag)) $pag=1;
+$alm = new Almacen();
+$objAjust= $alm->listarAjustesProd($cod_producto, $pag, $regxpag);
+$total_paginas=ceil($alm->total/$regxpag);
+
+$alm->getProducto($cod_producto);
+
 ?>
-<!DOCTYPE html>
+<!DOCTYPE html PUBLIC>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
   <title>Sistema de Ventas</title>
@@ -42,30 +52,7 @@
   <link href="assets/css/style.css" rel="stylesheet">
   <script type="text/javascript">
     $(document).ready(function() {
-        $("#datePickerDemo input.calendar").datepicker({showOn: 'button', buttonImage: 'images/calendar.png',
-            buttonImageOnly: true, firstDay:1, dateFormat: 'dd/mm/yy'});
-     
 
-        $("#codigo_producto").keyup(
-        function() {
-        valor = $("#codigo_producto").val();
-        $("#codigo_producto").val(valor.toUpperCase());
-        });
-        $("#descripcion").keyup(
-        function() {
-        valor = $("#descripcion").val();
-        $("#descripcion").val(valor.toUpperCase());
-        });
-        $("#marca").keyup(
-        function() {
-        valor = $("#marca").val();
-        $("#marca").val(valor.toUpperCase());
-        });
-        $("#nombre_producto").keyup(
-			function() {
-			valor = $("#nombre_producto").val();
-			$("#nombre_producto").val(valor.toUpperCase());
-		});
 
     });
 
@@ -77,8 +64,6 @@
     })(jQuery);
 
 
-</script>
-<script type="text/javascript">
 </script>
 </head>
 
@@ -133,15 +118,16 @@
   </header><!-- End Header -->
 
 
-  <main id="main" class="main">
+  <main id="main2" class="main">
       <!-- Error -->
         <?php if(!empty($err)){ ?> 
           <div class="row mb-3">
-            <div class="col-sm-8">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="col-sm-12">
+                <div <?php if($tp=='e'){ ?> class="alert alert-success alert-dismissible fade show" <?php }else{ ?> class="alert alert-danger alert-dismissible fade show" <?php } ?> role="alert">
                   <?php echo $err;  ?> 
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+              </div>
             </div>
           </div>
         <?php } ?> 
@@ -149,87 +135,79 @@
 
 
     <div class="pagetitle">
-      <h1>Registro de Producto</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registro de Producto</a></li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
+        <h1>Ver Ajustes de Producto</h1>
+        <nav>
+            <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="home.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="lista_productos.php">Lista Productos</a></li>
+            <li class="breadcrumb-item active"><a href="ajustar_producto.php?cod_producto=<?php echo $cod_producto; ?>">Ajuste Producto</a></li>
+            <li class="breadcrumb-item active"><a href="ajuste_producto_registrar.php?cod_producto=<?php echo $cod_producto; ?>"> Ver Ajustes</a></li>
+            </ol>
+
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><h3 class="card-title"><strong>Producto: </strong> <?php echo $alm->codigo_producto; ?> <?php echo $alm->nombre_producto; ?> <?php echo $alm->marca; ?></h3></li>
+            </ol>
+
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><span class="card-title"><strong>Existencia: </strong> <?php echo $alm->existencia; ?></span></li>
+            </ol>
+
+        </nav>
+    </div>
 
     <section class="section dashboard">
-        <form class="row g-3 needs-validation" novalidate action="./controller/Almacen.controller.php
-        "  method="POST" enctype="multipart/form-data">
-
-        <div class="row mb-3" style="padding-top: 12px;">
-          <div class="col-sm-6">
-            <span class="badge bg-danger">* Campos obligatorios</span>
-          </div>
-        </div>
-
-
         <div class="row mb-3">
-            <label for="codigo_producto" class="col-sm-2 col-form-label">C&oacute;digo Producto <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-                <input type="text" name="codigo_producto" id="codigo_producto" class="form-control" required>
+            <div class="col-lg-12">
+                <div class="card">
+                <div class="card-body">
+
+                    <!-- Table with stripped rows -->
+                    <table class="table table-striped">
+                    <thead>
+                        <tr>
+                        <th style="width: 5%; text-align: center;">Fecha Ajuste</th>
+                        <th style="width: 20%; text-align: center;">Cantidad</th>
+                        <th style="width: 30%; text-align: center;">Concepto Ajuste</th>
+                        <th style="width: 15%; text-align: center;">Registrado Por</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php 
+                        if(!empty($objAjust)) {
+				            foreach ($objAjust as $obj) {
+                    ?>
+                        <tr>
+                            <th scope="row"> <?php echo $obj->fecha_1; ?></th>
+                            <td style="text-align: center;"><?php if ($obj->tipo_ajuste=='Incremento') { $incre +=$obj->cant_ajuste;?><span style="font-size:14px; color:#3300FF; font-weight:bold;">(+) </span><?php } elseif ($obj->tipo_ajuste=='Decremento') {$dec +=$obj->cant_ajuste; ?><span style="font-size:14px; color:#FF0000; font-weight:bold;">(-) </span><?php } ?><?php echo $obj->cant_ajuste; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->concepto_ajuste; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
+                            
+                        </tr>
+                    <?php
+				            }
+				        }
+                    ?>
+                    </tbody>
+                    </table>
+                    
+
+                    <span class="d-flex align-items-center justify-content-center pagination">
+                      <label class="page-link">
+                        <?php 
+                          if (!empty($objAjust)) {
+                            echo $alm->primero?>
+                            -<?php echo $alm->ultimo?> de <?php echo $alm->total; 
+                          } 
+                        ?>
+                      </label>
+                    </span>
+
+                </div>
+                </div>
+
+                
             </div>
         </div>
-      
-        <div class="row mb-3">
-            <label for="nombre_producto" class="col-sm-2 col-form-label">Nombre <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-                <input type="text" name="nombre_producto" id="nombre_producto" class="form-control" required>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="descripcion" class="col-sm-2 col-form-label">Descripci&oacute;n</label>
-            <div class="col-sm-6">
-                <input type="text" name="descripcion" id="descripcion" class="form-control">
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="marca" class="col-sm-2 col-form-label">Marca</label>
-            <div class="col-sm-6">
-                <input type="text" name="marca" id="marca" class="form-control">
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Subir Imagen</label>
-            <div class="col-sm-6">
-            <input class="form-control" type="file" id="archivo" name="archivo">
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="cantidad_inicial" class="col-sm-2 col-form-label">Existencia <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-            <input type="number" class="form-control" name="cantidad_inicial" id="cantidad_inicial" required>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label for="precio" class="col-sm-2 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-            <input type="number" class="form-control" name="precio" id="precio" required>
-            </div>
-        </div>
-
-
-
-
-
-        <div class="row mb-3">
-            <label class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-6">
-                <button type="submit" class="btn btn-primary">Registrar Producto</button>
-                <input type="hidden" name="operacion" id="operacion" value="cpro">
-            </div>
-        </div>
-        </form>
     </section>
 
   </main><!-- End #main -->
