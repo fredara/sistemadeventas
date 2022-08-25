@@ -148,6 +148,10 @@
           <li class="breadcrumb-item"><h3 class="card-title"><strong>Producto: </strong> <?php echo $alm->codigo_producto; ?> <?php echo $alm->nombre_producto; ?> <?php echo $alm->marca; ?></h3></li>
         </ol>
 
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><span class="card-title"><strong>Existencia: </strong> <?php echo $alm->existencia; ?></span></li>
+        </ol>
+
       </nav>
     </div><!-- End Page Title -->
 
@@ -199,10 +203,6 @@
             <div class="col-sm-6">
                 <input type="text" name="concepto_ajuste" id="concepto_ajuste" class="form-control" required>
             </div>
-        </div>
-
-        <div class="row mb-3">
-            <label class="col-sm-8 col-form-label"><strong>Cantidad en Almac&eacute;n <?php echo $alm->existencia; ?></strong></label>
         </div>
 
 

@@ -8,6 +8,8 @@ $alm = new Almacen();
 $objProductos= $alm->listarProductos($pag, $regxpag);
 $total_paginas=ceil($alm->total/$regxpag);
 
+$grupo= $_SESSION['cod_grupo_usuario_log'];
+
 ?>
 <!DOCTYPE html PUBLIC>
 <html lang="en">
@@ -140,7 +142,7 @@ $total_paginas=ceil($alm->total/$regxpag);
           <li class="breadcrumb-item active"><a href="lista_productos.php">Lista de Productos</a></li>
         </ol>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto</a></li>
+          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto </a></li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -187,10 +189,11 @@ $total_paginas=ceil($alm->total/$regxpag);
                                     <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
 
                                     <li><?php echo "<a class='dropdown-item' href='modificar_producto.php?cod_producto=".$obj->cod_producto."'>Actualizar</a>"; ?></li>
-                                    
-                                    <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
+                                    <?php if($grupo==1){ ?>
+                                      <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
 
-                                    <li><?php echo "<a class='dropdown-item' href='precio_producto.php?cod_producto=".$obj->cod_producto."'>Precio</a>"; ?></li>
+                                      <li><?php echo "<a class='dropdown-item' href='precio_producto.php?cod_producto=".$obj->cod_producto."'>Precio</a>"; ?></li>
+                                    <?php } ?>
                                   </ul>
                                 </div>
                               </div>

@@ -65,3 +65,11 @@
     background-color: #8D93A5 !important;
     --bs-btn-color: #000;
 }
+
+.boton_busqueda {
+	font-size:12px;
+	font-weight:normal;
+	background: #ffffff url(../images/lupa.jpg) right no-repeat;
+	height:20px;
+	border: 1px solid #999999;
+}

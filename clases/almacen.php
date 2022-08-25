@@ -182,6 +182,28 @@
 			return $return;
 		}
 
+		function comboProductos($cod_producto){
+			$err="OK";
+			$query="SELECT t1.* from tbl_producto t1 order by t1.nombre_producto asc";
+			//echo "$query";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			mysqli_set_charset($con, "utf8");
+			@mysqli_select_db($con,$this->vardb);		
+			$rs=@mysqli_query($con,$query);
+				while($obj = @mysqli_fetch_object($rs)){
+					echo "<option value=\"$obj->cod_producto\" ";
+					if($cod_producto==$obj->cod_producto)
+						echo "selected";
+
+					$texto = $obj->nombre_producto;
+
+					echo ">$texto</option>\n";
+				}
+
+				@mysqli_close($con);
+		}
+
+
 		function modExistProducto($cod_producto, $cant_ajuste) {
 			$err="OK";
 			$query="UPDATE tbl_producto set cantidad='$cant_ajuste' WHERE cod_producto='$cod_producto'";
