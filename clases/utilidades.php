@@ -26,5 +26,60 @@
             } 
             return $ip_visitante;
         }
+
+
+        function comboBanco($id_banco){
+            $err="OK";						
+            //$query="SELECT t1.*, t2.nombre_banco FROM tbl_banco_pagos t1 LEFT JOIN tbl_banco t2 ON (t1.cod_banco = t2.cod_banco) ORDER BY t2.nombre_banco ASC";
+            $query="SELECT t1.* FROM tbl_banco t1 ORDER BY t1.nombre_banco ASC";
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);
+            $rs=@mysqli_query($con,$query);
+            while($obj = @mysqli_fetch_object($rs)) {
+                echo "<option value=\"$obj->cod_banco\" ";
+                if ($id_banco==$obj->cod_banco)
+                    echo "selected";
+                echo ">$obj->nombre_banco</option>\n";
+            }
+            @mysqli_close($con);
+        }
+
+        function getTasaCambio(){
+            $err="OK";
+            $query="select t1.* from tbl_tasa_cambio t1";
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            mysqli_set_charset($con, "utf8");
+            @mysqli_select_db($con,$this->vardb);		
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)>0){
+                $this->tasa_cambio=$this->mysqli_result($rs,0,'tasa_cambio');
+            } else {
+            }
+            if ($rs) {}
+            else { $err="X"; }
+            @mysqli_close($con);
+            return $err;
+        }
+
+        function ListacomboBanco(){
+			$err="OK";
+			$cadena='';
+            $query="SELECT t1.* FROM tbl_banco t1 ORDER BY t1.nombre_banco ASC";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			mysqli_set_charset($con, "utf8");
+			@mysqli_select_db($con,$this->vardb);		
+			$rs=@mysqli_query($con,$query);
+			while($obj = @mysqli_fetch_object($rs)) {
+				$cadena= $cadena."<option value=$obj->cod_banco>$obj->nombre_banco</option>";
+			}
+			@mysqli_close($con);
+			return $cadena;
+		}
+
+        function mysqli_result($res, $row, $field=0) { 
+            $res->data_seek($row); 
+            $datarow = $res->fetch_array(); 
+            return $datarow[$field]; 
+        }
     }
 ?>

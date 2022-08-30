@@ -203,6 +203,22 @@
 				@mysqli_close($con);
 		}
 
+		function getListaProductos($cod_producto){
+			$err="OK";
+			$cadena='';
+			$query="select t1.* from tbl_producto t1  order by t1.nombre_producto asc";
+			//$query="select t1.* from tbl_producto t1 order by t1.nombre_producto";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			mysqli_set_charset($con, "utf8");
+			@mysqli_select_db($con,$this->vardb);		
+			$rs=@mysqli_query($con,$query);
+			while($obj = @mysqli_fetch_object($rs)) {
+				$cadena= $cadena."<option value=$obj->cod_producto>$obj->nombre_categoria  $obj->nombre_producto</option>";
+			}
+			@mysqli_close($con);
+			return $cadena;
+		}
+
 
 		function modExistProducto($cod_producto, $cant_ajuste) {
 			$err="OK";

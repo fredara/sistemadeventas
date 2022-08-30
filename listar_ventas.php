@@ -1,12 +1,12 @@
 <?php
 extract($_REQUEST);
 require_once("./inc/sesion.php");
-require_once("./clases/almacen.php");
+require_once("./clases/ventas.php");
 if (empty($regxpag))  $regxpag=30;
 if (empty($pag)) $pag=1;
-$alm = new Almacen();
-$objProductos= $alm->listarProductos($pag, $regxpag);
-$total_paginas=ceil($alm->total/$regxpag);
+$vent = new Ventas();
+$objVentas= $vent->listarProductos($pag, $regxpag);
+$total_paginas=ceil($vent->total/$regxpag);
 
 $grupo= $_SESSION['cod_grupo_usuario_log'];
 
@@ -139,10 +139,10 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active"><a href="lista_productos.php">Lista de Productos</a></li>
+          <li class="breadcrumb-item active"><a href="listar_ventas.php">Lista de Ventas</a></li>
         </ol>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto </a></li>
+          <li class="breadcrumb-item active"><a href="registro_ventas.php">Registrar Venta</a></li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -157,29 +157,27 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th style="width: 5%; text-align: center;"># Item</th>
-                        <th style="width: 20%; text-align: center;">C&oacute;digo Producto</th>
-                        <th style="width: 30%; text-align: center;">Nombre</th>
-                        <th style="width: 15%; text-align: center;">Marca</th>
-                        <th style="width: 5%; text-align: center;">Existencia</th>
-                        <th style="width: 10%; text-align: center;">Precio</th>
+                        <th style="width: 5%; text-align: center;"># Venta</th>
+                        <th style="width: 20%; text-align: center;">Cliente</th>
+                        <th style="width: 30%; text-align: center;">Fecha</th>
+                        <th style="width: 15%; text-align: center;">Total</th>
+                        <th style="width: 5%; text-align: center;">Creado Por</th>
                         <th style="width: 5%; text-align: center;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php 
-                        if(!empty($objProductos)) {
-				                  foreach ($objProductos as $obj) {
+                        if(!empty($objVentas)) {
+				                  foreach ($objVentas as $obj) {
                     ?>
                         <tr>
-                            <th scope="row"> <?php echo $obj->cod_producto; ?></th>
-                            <td style="text-align: center;"><?php echo $obj->codigo_producto; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->nombre_producto; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->marca; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->cantidad; ?></td>
-                            <td style="text-align: center;"><?php echo @number_format($obj->precio, 2, ',', '.'); echo " $"; ?></td>
+                            <th scope="row"> <?php echo $obj->cod_venta; ?></th>
+                            <td style="text-align: center;"><?php echo $obj->nombre_cliente; ?></td>
+                            <td style="text-align: center;"><?php echo $obj->fecha_vent; ?></td>
+                            <td style="text-align: center;"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
+                            <td style="text-align: center;"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
                             <td style="text-align: center;">
-                              <div class="card almacenamiento-card">
+                              <!--<div class="card ventacenamiento-card">
                                 <div class="filter centrar1">
                                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -196,7 +194,7 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                                     <?php } ?>
                                   </ul>
                                 </div>
-                              </div>
+                              </div>-->
                             </td>
                         </tr>
                     <?php
@@ -211,17 +209,17 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                     ?>
                         <nav aria-label="Page navigation example" class="d-flex align-items-center justify-content-center">
                           <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="lista_productos.php?pag=1" title='Ir a Inicio de la Lista'>Primero</a></li>
-                            <?php if ($pag>1) echo "<li class='page-item'><a class='page-link' href='lista_productos.php?pag=".($pag-1)."'>Anterior</a></li>";
+                            <li class="page-item"><a class="page-link" href="listar_ventas.php?pag=1" title='Ir a Inicio de la Lista'>Primero</a></li>
+                            <?php if ($pag>1) echo "<li class='page-item'><a class='page-link' href='listar_ventas.php?pag=".($pag-1)."'>Anterior</a></li>";
 
                                 for ($i = $pag; $i <= $total_paginas && $i<=($pag+$display_pages); $i++) {
                                   if ($i == $pag) echo "<strong class='page-link'>$i - </strong>";//not printing the link
-                                  else echo " <li class='page-item'><a class='page-link' href='lista_productos.php?pag=$i' title='page $i'>$i</a></li> - ";//link
+                                  else echo " <li class='page-item'><a class='page-link' href='listar_ventas.php?pag=$i' title='page $i'>$i</a></li> - ";//link
                                 }
 
                                 if (($pag+$display_pages)< $total_paginas) echo "..."; //etcetera...
-                                if ($pag<$total_paginas) echo " <a class='page-link' title='Next' href='lista_productos.php?pag=".($pag+1)."'> Pr&oacute;ximo >></a> ";//Next
-                                echo "<a class='page-link' title='Ultima Pagina' href='lista_productos.php?pag=$total_paginas'>&Uacute;ltimo >></a> ";
+                                if ($pag<$total_paginas) echo " <a class='page-link' title='Next' href='listar_ventas.php?pag=".($pag+1)."'> Pr&oacute;ximo >></a> ";//Next
+                                echo "<a class='page-link' title='Ultima Pagina' href='listar_ventas.php?pag=$total_paginas'>&Uacute;ltimo >></a> ";
                             ?>
                           </ul>
                         </nav>
@@ -232,9 +230,9 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                     <span class="d-flex align-items-center justify-content-center pagination">
                       <label class="page-link">
                         <?php 
-                          if (!empty($objProductos)) {
-                            echo $alm->primero?>
-                            -<?php echo $alm->ultimo?> de <?php echo $alm->total; 
+                          if (!empty($objVentas)) {
+                            echo $vent->primero?>
+                            -<?php echo $vent->ultimo?> de <?php echo $vent->total; 
                           } 
                         ?>
                       </label>

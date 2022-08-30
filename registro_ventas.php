@@ -5,9 +5,12 @@
 
   require_once("clases/ventas.php");
   require_once("clases/almacen.php");
+  require_once("clases/utilidades.php");
+  $uti=new Utilidades();
   $alm=new Almacen();
   $ven=new Ventas();
   $ven->getCodigoUltimoPedido();
+  $uti->getTasaCambio();
   //$n_ven=1;
   if(empty( $ven->nro_venta)){ $ven->nro_venta = '0001';}else{
     $loncadena = strlen( $ven->nro_venta);
@@ -23,6 +26,12 @@
     }
     
   };
+
+  $lista_productos=$alm->getListaProductos(0);
+
+
+  $lista_comboBanco = $uti->ListacomboBanco();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,6 +69,7 @@
     <script type="text/javascript" src="js/jquery-ui-1.8.14.custom.min.js"></script>
     <script type="text/javascript" src="js/jquerymask.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/top_up-min.js"></script>
+
 
 
   <link href="assets/css/style.css" rel="stylesheet">
@@ -115,12 +125,27 @@
 
 
 </script>
+<script type="text/javascript" src="js/cliente_existe.js"></script>
 <script type="text/javascript">
   let cantidad_permitida = [] ;
   campos=1;
-  ped=0;
+  pagos=0;
+  ven=0;
   m=0;
 
+  function cambiaTasa(valor){
+    if(valor=='' || valor==null){
+      document.getElementById("tasa_cambio").value = <?php echo $uti->tasa_cambio; ?>;
+    }
+  }
+
+  function cambiaMoneda(valor){
+    if(valor=='USD'){
+      document.getElementById("info_mone").innerHTML = 'USD';
+    }else{
+      document.getElementById("info_mone").innerHTML = 'BS';
+    }
+  }
   function habilita(elemento) {
       if(elemento.value=='cedula') {
           document.getElementById('row_cedula_cliente').style.display = "flex";
@@ -194,9 +219,9 @@
               //console.log(resultado);
               var resul = parseFloat(resultado*tasa_cambio);
             }
-           
+            resul = number_format(resul,2,'.','');
             document.getElementById("cantidad"+campo).value=1;
-            document.getElementById("precioxuni"+campo).value=resul;
+            document.getElementById("precioxuni"+campo).value= resul;
             document.getElementById("precio"+campo).value=pre;
             document.getElementById("mens"+campo).innerHTML='';
 
@@ -255,16 +280,16 @@
   }
 
   function sumacampos(id) {
-    var cantidad_precio = 0;
-    var tot = 0;
-    var total_venta = 0;
-    var iva_r = 10;
-    var iva_n = 16;
-    var base_imponible = 0;
-    var base_imponible_r = 0;
-    var no_gravable = 0;
-    var valor_iva = 0;
-    var valor_iva_r = 0;
+    let cantidad_precio = 0;
+    let tot = 0;
+    let total_venta = 0;
+    let iva_r = 10;
+    let iva_n = 16;
+    let base_imponible = 0;
+    let base_imponible_r = 0;
+    let no_gravable = 0;
+    let valor_iva = 0;
+    let valor_iva_r = 0;
     
     if(id>=campos)
       campos=campos+1;
@@ -307,13 +332,25 @@
     document.getElementById('iva_n').value =  number_format(valor_iva,2,'.','');
     document.getElementById('ivar').value = number_format(valor_iva_r,2,'.','');
     document.getElementById('total').value = number_format(total_venta,2,'.','');
+
+    let info_cambio = 0; 
+    let tasa_cambio = document.getElementById('tasa_cambio').value;
+    var mon = '';
+    if(document.getElementById('monedaBSS').checked == true ){
+      info_cambio = total_venta / tasa_cambio;
+      mon = 'USD';
+    }else{
+      info_cambio = total_venta * tasa_cambio;
+      mon = 'BSS';
+    }
+    document.getElementById('info_monto_cambio').innerHTML = number_format(info_cambio,2,'.','')+" "+mon;
+
+    PagoRegistrado(pag);
   }
 
   function limtCant(campo, elemt){
     let b;
     let u;
-    let pro_por;
-    let cant_limt;
 
     if (parseInt(elemt.value)>parseInt(cantidad_permitida[campo])) {
       document.getElementById(elemt.id).value=cantidad_permitida[campo];
@@ -346,7 +383,187 @@
 }
 
 
+function agregar() {
+	ven=ven+1;
+	m=m+1;
+  var lista_productos = '<?php echo $lista_productos;?>';
+	 $("#tabla_detalle").append('<div class="row mb-12 deta'+ven+' espacio" ><div class="col-sm-4"><select name="cod_producto[]" id="cod_producto'+ven+'" onchange="CargaDataProduct(this.value, '+ven+'); sumacampos('+ven+');" onblur="sumacampos('+ven+');" class="form-select" required><option value="">Seleccione</option>'+lista_productos+'</select>&nbsp; &nbsp;<input name="nombre_pro'+ven+'" type="text" class="boton_busqueda form-control" id="nombre_pro'+ven+'" size="20" placeholder="Buscar Producto" onblur="CargaDataProduct(null, '+ven+');" /><span id="mens'+ven+'" class="badge border-danger border-1 text-danger"></span></div><div class="col-sm-1"><input type="text" class="form-control" name="cantidad[]" id="cantidad'+ven+'" onkeyup="sumacampos('+ven+'); limtCant('+ven+', this);" onblur="sumacampos('+ven+'); limtCant('+ven+', this);" alt="Integer2" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precioxuni[]" id="precioxuni'+ven+'" onkeyup="sumacampos('+ven+');" alt="Costo" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precio[]" id="precio'+ven+'" required readonly></div><div class="col-sm-2"><label for="iva1'+ven+'">16%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva1'+ven+'" value="16" onchange="sumacampos('+ven+');"><label for="iva2'+ven+'">10%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva2'+ven+'" value="10" onchange="sumacampos('+ven+');"><label for="iva3'+ven+'">N/A</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva3'+ven+'" value="0" checked required onchange="sumacampos('+ven+');"></div><div class="col-sm-1"><a href="#b" onclick="javascript:borrar('+ven+');sumacampos_d('+ven+');">Borrar</a></div></div>');
 
+   var opts_pro = $('#cod_producto'+ven+' option').map(function () {
+      return [[this.value, $(this).text()]];
+    });
+    $('#nombre_pro'+ven+'').keyup(function () {
+      //console.log("cod_producto"+m);
+      var rxp = new RegExp($('#nombre_pro'+ven+'').val(), 'i');
+      var optlist = $('#cod_producto'+ven+'').empty();
+      opts_pro.each(function () {
+        if (rxp.test(this[1])) {
+          optlist.append($('<option/>').attr('value', this[0]).text(this[1]));
+        }
+      });
+  
+    });
+}
+
+function borrar(cual) {
+	$("div.deta"+cual).remove();
+	return false;
+}
+
+
+
+
+let pag = 1; 
+let campo_pagos=1;
+function agregar_pago(){
+  pag=pag+1;
+  var lista_comboBanco = '<?php echo $lista_comboBanco;?>';
+    $("#tabla_detalle_pago").append('<div class="row mb-12 deta_pago'+pag+'"><div class="col-sm-2"><select class="form-select" name="moneda_pago[]" aria-label="Default select example" id="moneda'+pag+'" required onchange="mostrarppago(this);"><option value="">--</option><option value="BS">Bolivares</option><option value="USD">Dolares</option></select></div><div class="col-sm-2"><select class="form-select" name="instru_p[]" aria-label="Default select example" id="instru_p'+pag+'" required><option value="" selected>--</option><option value="Cheque" id="cheque'+pag+'">Cheque</option><option value="Deposito" id="deposito'+pag+'">Depósito</option><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta de Debito" id="tdd'+pag+'">Tarjeta de Débito</option><option value="Tarjeta de Credito" id="tdc'+pag+'">Tarjeta de Crédito</option><option value="Zelle" id="zelle'+pag+'">Zelle</option><option value="Pago Movil" id="pagomovil'+pag+'">Pago Movil</option></select></div><div class="col-sm-2"><select class="form-select" name="banco_p[]" aria-label="Default select example" id="banco_p'+pag+'"><option value="" selected>--</option>'+lista_comboBanco+'</select></div><div class="col-sm-2"><input type="number" class="form-control" name="numero_p[]" id="numero_p'+pag+'"></div><div class="col-sm-2"><input type="text" class="form-control" name="monto_p[]" id="monto_p'+pag+'" onkeyup="PagoRegistrado('+pag+');" alt="Costo" required></div><div class="col-sm-1"><a href="#b" onclick="javascript:borrar_detaPago('+pag+');PagoRegistrado('+pag+');">Borrar</a></div></div>');
+
+}
+
+function borrar_detaPago(cual) {
+	$("div.deta_pago"+cual).remove();
+	return false;
+}
+
+
+
+
+
+
+
+function mostrarppago(val){
+  var id = val.id;
+  var res = id.replace("moneda", "");
+  //console.log(res);
+
+  if(val.value=='BSS'){
+    document.getElementById("cheque"+res).disabled = false;
+    document.getElementById("deposito"+res).disabled = false;
+    document.getElementById("tdd"+res).disabled = false;
+    document.getElementById("tdc"+res).disabled = false;
+    document.getElementById("zelle"+res).disabled = true;
+    document.getElementById("pagomovil"+res).disabled = false;
+
+  } 
+  if(val.value=='USD'){
+    document.getElementById("cheque"+res).disabled = true;
+    document.getElementById("deposito"+res).disabled = true;
+    document.getElementById("tdd"+res).disabled = true;
+    document.getElementById("tdc"+res).disabled = true;
+    document.getElementById("pagomovil"+res).disabled = true;
+  }
+  if(val.value=='USD'){
+    document.getElementById("zelle"+res).disabled = false;
+  }
+  if(val.value=='BSS'){
+    document.getElementById("zelle"+res).disabled = true;
+  }
+
+  document.getElementById("instru_p"+res).value = "";
+  document.getElementById("banco_p"+res).value = "";
+  document.getElementById("numero_p"+res).value = "";
+  document.getElementById("monto_p"+res).value = "";
+
+}
+
+
+function PagoRegistrado(id_pago){
+  let TotalAPagar = document.getElementById('total').value;
+  if(TotalAPagar==''){TotalAPagar=0;}
+  TotalAPagar = TotalAPagar.replace(",", ""); 
+  let TotalPagado_BS = 0;
+  let TotalPagado_USD = 0;
+
+  let faltante_bs = 0;
+  let faltante_usd = 0;
+
+  let tasa_cambio = parseFloat(document.getElementById('tasa_cambio').value);
+  if(id_pago>=campo_pagos)
+      campo_pagos=campo_pagos+1;
+  for (let i = 0; i < campo_pagos; i++) {
+    if(document.getElementById('monto_p'+i)) {
+    if(document.getElementById('monto_p'+i).value != '') {
+      if(document.getElementById('moneda'+i).value  == 'USD'){
+        TotalPagado_USD = TotalPagado_USD + parseFloat(document.getElementById('monto_p'+i).value);
+
+        //TotalPagado_BS = TotalPagado_BS + (parseFloat(document.getElementById('monto_p'+i).value) * tasa_cambio );
+      }else{
+        TotalPagado_BS = TotalPagado_BS + parseFloat(document.getElementById('monto_p'+i).value);
+
+        //TotalPagado_USD = TotalPagado_USD + (parseFloat(document.getElementById('monto_p'+i).value) / tasa_cambio);
+      }
+    }
+    }
+  }
+
+
+
+  if (TotalPagado_BS>0) {
+    if(document.getElementById('monedaBSS').checked == true ){
+      faltante_bs = TotalAPagar - TotalPagado_BS - (TotalPagado_USD*tasa_cambio);
+    }else{
+      faltante_bs = (TotalAPagar*tasa_cambio) - TotalPagado_BS - (TotalPagado_USD*tasa_cambio);
+    }
+    
+    if(faltante_bs<=0){
+      document.getElementById("registrar_venta").disabled = false;
+      //if(faltante_bs<0){faltante_bs=0;}
+    }
+  }
+
+    if (TotalPagado_USD>0) {
+      if(document.getElementById('monedaBSS').checked == true ){
+        faltante_usd = (TotalAPagar/tasa_cambio) - TotalPagado_USD - (TotalPagado_BS/tasa_cambio);
+      }else{
+        faltante_usd = TotalAPagar - TotalPagado_USD - (TotalPagado_BS/tasa_cambio);
+      }
+      if(faltante_usd<=0){
+        document.getElementById("registrar_venta").disabled = false;
+        //if(faltante_usd<0){faltante_usd=0;}
+      }
+    }
+  
+
+
+  document.getElementById("total_pagadoBS").value = number_format(TotalPagado_BS,2,'.','');
+  document.getElementById("total_pagadoUSD").value = number_format(TotalPagado_USD,2,'.','');
+  if(faltante_bs<0){
+    document.getElementById("faltante_bs_msg").innerHTML = "Vuelto: "+number_format(faltante_bs*-1,2,'.','')+" BS";
+  }else{
+    document.getElementById("faltante_bs_msg").innerHTML = "Resta: "+number_format(faltante_bs,2,'.','')+" BS";
+  }
+
+  if(faltante_usd<0){
+    document.getElementById("faltante_usd_msg").innerHTML = "Vuelto: "+number_format(faltante_usd*-1,2,'.','')+" $";
+  }else{
+    document.getElementById("faltante_usd_msg").innerHTML = "Resta: "+number_format(faltante_usd,2,'.','')+" $";
+  }
+
+  if(TotalPagado_BS==0 && TotalPagado_USD==0){
+    document.getElementById("faltante_bs_msg").innerHTML = "";
+    document.getElementById("faltante_usd_msg").innerHTML = "";
+  }
+}
+
+function VaciarTodo() {
+  for(var i=0; i <= ven; i++) {
+    document.getElementById("cod_producto"+i).value="";
+    document.getElementById("cantidad"+i).value='';
+    document.getElementById("precioxuni"+i).value='';
+    document.getElementById("precio"+i).value='';
+  }
+
+  document.getElementById('subtotal').value =  '';
+  document.getElementById('subtotal_R').value = '';
+  document.getElementById('exento').value =  '';
+  document.getElementById('iva_n').value =  '';
+  document.getElementById('ivar').value = '';
+  document.getElementById('total').value = '';
+  document.getElementById('info_monto_cambio').innerHTML = '';
+  
+}
 
 </script>
 
@@ -405,6 +622,19 @@
 
 
   <main id="main" class="main">
+    <!-- Error -->
+    <?php if(!empty($err)){ ?> 
+          <div class="row mb-3">
+            <div class="col-sm-12">
+                <div <?php if($tp=='e'){ ?> class="alert alert-success alert-dismissible fade show" <?php }else{ ?> class="alert alert-danger alert-dismissible fade show" <?php } ?> role="alert">
+                  <?php echo $err;  ?> 
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <?php } ?> 
+      <!-- End Error -->
 
     <div class="pagetitle">
       <h1>Registro de Ventas</h1>
@@ -435,16 +665,17 @@
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Moneda <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-                <label for="monedaBSS">BSS</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaBSS" value="BSS" checked required>
-                <label for="monedaUSD">USD</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaUSD" value="USD">
+                <label for="monedaBSS">BSS</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaBSS" value="BSS" checked required onchange="cambiaMoneda(this.value);">
+                <label for="monedaUSD">USD</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaUSD" value="USD" onchange="cambiaMoneda(this.value);">
             </div>
         </div>
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Tasa de Cambio <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-              <input type="number" class="form-control" name="tasa_cambio" id="tasa_cambio" value="7" required>
+              <input type="text" alt="Costo" class="form-control" name="tasa_cambio" id="tasa_cambio" value="<?php echo $uti->tasa_cambio;?>" onblur="cambiaTasa(this.value);" onkeyup="VaciarTodo();" required>
             </div>
         </div>
+            
 
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Tipo de Documento <span class="badge border-danger border-1 text-danger">*</span></label>
@@ -460,19 +691,19 @@
         <div class="row mb-3" id="row_rif_cliente" style="display: none;">
             <label for="rif_cliente" class="col-sm-2 col-form-label">Rif</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" alt="Rif" name="rif_cliente" id="rif_cliente" >
+                <input type="text" class="form-control" alt="Rif" name="rif_cliente" id="rif_cliente" onkeyup="existeCliente(this);" >
             </div>
         </div>
         <div class="row mb-3" id="row_cedula_cliente" style="display: none;">
             <label for="num_cedula" class="col-sm-2 col-form-label">C&eacute;dula</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" alt="Ced" name="num_cedula" id="num_cedula" >
+                <input type="text" class="form-control" alt="Ced" name="num_cedula" id="num_cedula" onkeyup="existeCliente(this);" >
             </div>
         </div>
         <div class="row mb-3" id="row_pasaporte_cliente" style="display: none;">
             <label for="num_pasaporte" class="col-sm-2 col-form-label">Pasaporte</label>
             <div class="col-sm-6">
-                <input type="text" class="form-control" alt="pas" name="num_pasaporte" id="num_pasaporte" >
+                <input type="text" class="form-control" alt="pas" name="num_pasaporte" id="num_pasaporte" onkeyup="existeCliente(this);" >
             </div>
         </div>
 
@@ -485,7 +716,14 @@
         <div class="row mb-3">
             <label for="inputPassword" class="col-sm-2 col-form-label">Direcci&oacute;n</label>
             <div class="col-sm-6">
-            <textarea class="form-control" style="height: 100px" name="direccion_cliente"></textarea>
+            <textarea class="form-control" style="height: 55px" name="direccion_cliente" id="direccion_cliente"></textarea>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="observacion" class="col-sm-2 col-form-label">Observaci&oacute;n</label>
+            <div class="col-sm-6">
+            <textarea class="form-control" style="height: 55px" name="observacion" id="observacion"></textarea>
             </div>
         </div>
 
@@ -494,9 +732,9 @@
           <div class="card">
             <h5 class="card-title">Detalle de la Venta</h5>
             <div class="card-body">
-              <div class="containter">
+              <div class="containter" id="tabla_detalle">
                 <div class="row mb-12">
-                  <div class="col-sm-5">
+                  <div class="col-sm-4">
                     <span class="badge border-primary border-1 text-primary">Producto <span class="badge border-danger border-1 text-danger">*</span></span>
                   </div>
 
@@ -516,12 +754,14 @@
                   <div class="col-sm-2">
                     <span class="badge border-primary border-1 text-primary">IVA <span class="badge border-danger border-1 text-danger">*</span></span>
                   </div>
+                  <div class="col-sm-1">
+                  </div>
                 </div>
 
 
 
                 <div class="row mb-12">
-                  <div class="col-sm-5">
+                  <div class="col-sm-4">
                     <select name="cod_producto[]" id="cod_producto0" onchange="CargaDataProduct(this.value, '0'); sumacampos('1');" onblur="sumacampos('1');" class="form-select" required>
                       <option value="">Seleccione</option>
                       <?php $alm->comboProductos(0)?>
@@ -531,11 +771,11 @@
                   </div>
 
                   <div class="col-sm-1">
-                    <input type="number" class="form-control" name="cantidad[]" id="cantidad0" onkeyup="sumacampos('1'); limtCant('0', this);" onblur="sumacampos('1'); limtCant('0', this);" required>
+                    <input type="text" class="form-control" name="cantidad[]" id="cantidad0" onkeyup="sumacampos('1'); limtCant('0', this);" onblur="sumacampos('1'); limtCant('0', this);" alt="Integer2" required>
                   </div>
 
                   <div class="col-sm-2">
-                    <input type="number" class="form-control" name="precioxuni[]" id="precioxuni0" onkeyup="sumacampos('1');" required>
+                    <input type="text" class="form-control" name="precioxuni[]" id="precioxuni0" onkeyup="sumacampos('1');" alt="Costo" required>
                   </div>
 
 
@@ -544,10 +784,18 @@
                   </div>
 
                   <div class="col-sm-2">
-                    <label for="monedaUSD">16%</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva10" value="16" onchange="sumacampos('1');">
-                    <label for="monedaUSD">10%</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva20" value="10" onchange="sumacampos('1');">
-                    <label for="monedaUSD">N/A</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva30" value="0" checked required onchange="sumacampos('1');">
+                    <label for="iva10">16%</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva10" value="16" onchange="sumacampos('1');">
+                    <label for="iva20">10%</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva20" value="10" onchange="sumacampos('1');">
+                    <label for="iva30">N/A</label>  <input type="radio" class="form-check-input" name="iva[]" id="iva30" value="0" checked required onchange="sumacampos('1');">
                   </div>
+                  <div class="col-sm-1">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-12">
+                <div class="col-sm-5">
+                  <a name="a" id="a"></a><a href="javascript:agregar();" class="enlace1">Agregar otro</a>
                 </div>
               </div>
             </div>
@@ -594,11 +842,116 @@
               </div>
 
               <div class="row mb-3">
-                  <label for="inputPassword" class="col-sm-2 col-form-label">Total:</label>
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Total <span id="info_mone">BS</span>:</label>
                   <div class="col-sm-3">
                     <input type="text" class="form-control" name="total" id="total" disabled>
+                    <span class="badge border-danger border-1 text-danger" id="info_monto_cambio"></span>
                   </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="row mb-12">
+          <div class="card">
+            <h5 class="card-title">Detalle de Pago</h5>
+            <div class="card-body">
+            <div class="containter" id="tabla_detalle_pago">
+                <div class="row mb-12">
+                  <div class="col-sm-2">
+                    <span class="badge border-primary border-1 text-primary">Moneda <span class="badge border-danger border-1 text-danger">*</span></span>
+                  </div>
+
+                  <div class="col-sm-2">
+                    <span class="badge border-primary border-1 text-primary">Instrumento <span class="badge border-danger border-1 text-danger">*</span></span>
+                  </div>
+
+                  <div class="col-sm-2">
+                    <span class="badge border-primary border-1 text-primary">Banco</span>
+                  </div>
+
+
+                  <div class="col-sm-2">
+                    <span class="badge border-primary border-1 text-primary">Nro Transacci&oacute;n</span>
+                  </div>
+
+                  <div class="col-sm-2">
+                    <span class="badge border-primary border-1 text-primary">Monto <span class="badge border-danger border-1 text-danger">*</span></span>
+                  </div>
+                  <div class="col-sm-1">
+                  </div>
+                </div>
+
+
+
+                <div class="row mb-12">
+                  <div class="col-sm-2">
+                    <select class="form-select" name="moneda_pago[]" aria-label="Default select example" id="moneda1" required onchange="mostrarppago(this);">
+                        <option value="">--</option>
+                        <option value="BS">Bolivares</option>
+                        <option value="USD">Dolares</option>
+                    </select>
+                  </div>
+
+                  <div class="col-sm-2">
+                    <select class="form-select" name="instru_p[]" aria-label="Default select example" id="instru_p1" required>
+                        <option value="" selected>--</option>
+                        <option value="Cheque" id="cheque1">Cheque</option>
+                        <option value="Deposito" id="deposito1">Depósito</option>
+                        <option value="Efectivo">Efectivo</option>
+                        <option value="Transferencia">Transferencia</option>
+                        <option value="Tarjeta de Debito" id="tdd1">Tarjeta de Débito</option>
+                        <option value="Tarjeta de Credito" id="tdc1">Tarjeta de Crédito</option>
+                        <option value="Zelle" id="zelle1">Zelle</option>
+                        <option value="Pago Movil" id="pagomovil1">Pago Movil</option>
+                    </select>
+                  </div>
+
+                  <div class="col-sm-2">
+                    <select class="form-select" name="banco_p[]" aria-label="Default select example" id="banco_p1">
+                        <option value="" selected>--</option>
+                        <?php $uti->comboBanco(0);?>
+                    </select>
+                  </div>
+
+
+                  <div class="col-sm-2">
+                    <input type="number" class="form-control" name="numero_p[]" id="numero_p1">
+                  </div>
+
+                  <div class="col-sm-2">
+                    <input type="text" class="form-control" name="monto_p[]" id="monto_p1" onkeyup="PagoRegistrado(1);" alt="Costo" required>
+                  </div>
+
+                  <div class="col-sm-1">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row mb-12">
+                <div class="col-sm-5">
+                  <a name="a" id="a"></a><a href="javascript:agregar_pago();" class="enlace1">Agregar otro</a>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Pagado BS:</label>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control" name="total_pagadoBS" id="total_pagadoBS" disabled>
+                    <span class="badge border-danger border-1 text-danger" id="faltante_bs_msg"></span>
+                  </div>
+              </div>
+
+              <div class="row mb-3">
+                  <label for="inputPassword" class="col-sm-2 col-form-label">Pagado USD:</label>
+                  <div class="col-sm-3">
+                    <input type="text" class="form-control" name="total_pagadoUSD" id="total_pagadoUSD" disabled>
+                    <span class="badge border-danger border-1 text-danger" id="faltante_usd_msg"></span>
+                  </div>
+              </div>
+
+
             </div>
           </div>
         </div>
@@ -612,7 +965,7 @@
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label"></label>
             <div class="col-sm-6">
-              <button type="submit" class="btn btn-primary">Registrar Venta</button>
+              <button type="submit" class="btn btn-primary" id="registrar_venta" disabled>Registrar Venta</button>
               <input type="hidden" name="operacion" id="operacion" value="reg_venta">
             </div>
         </div>
