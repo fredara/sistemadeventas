@@ -662,19 +662,6 @@ function VaciarTodo() {
                 <input type="date" name="fecha_venta" id="fecha_venta" class="form-control" value="<?php echo $fecha_hoy; ?>" required>
             </div>
         </div>
-        <div class="row mb-3">
-            <label class="col-sm-2 col-form-label">Moneda <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-                <label for="monedaBSS">BSS</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaBSS" value="BSS" checked required onchange="cambiaMoneda(this.value);">
-                <label for="monedaUSD">USD</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaUSD" value="USD" onchange="cambiaMoneda(this.value);">
-            </div>
-        </div>
-        <div class="row mb-3">
-            <label class="col-sm-2 col-form-label">Tasa de Cambio <span class="badge border-danger border-1 text-danger">*</span></label>
-            <div class="col-sm-6">
-              <input type="text" alt="Costo" class="form-control" name="tasa_cambio" id="tasa_cambio" value="<?php echo $uti->tasa_cambio;?>" onblur="cambiaTasa(this.value);" onkeyup="VaciarTodo();" required>
-            </div>
-        </div>
             
 
         <div class="row mb-3">
@@ -720,12 +707,22 @@ function VaciarTodo() {
             </div>
         </div>
 
+        
         <div class="row mb-3">
-            <label for="observacion" class="col-sm-2 col-form-label">Observaci&oacute;n</label>
+            <label class="col-sm-2 col-form-label">Tasa de Cambio <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-            <textarea class="form-control" style="height: 55px" name="observacion" id="observacion"></textarea>
+              <input type="text" alt="Costo" class="form-control" name="tasa_cambio" id="tasa_cambio" value="<?php echo $uti->tasa_cambio;?>" onblur="cambiaTasa(this.value);" onkeyup="VaciarTodo();" required>
             </div>
         </div>
+        <div class="row mb-3">
+            <label class="col-sm-2 col-form-label">Moneda <span class="badge border-danger border-1 text-danger">*</span></label>
+            <div class="col-sm-6">
+                <label for="monedaBSS">BSS</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaBSS" value="BSS" checked required onchange="cambiaMoneda(this.value);">
+                <label for="monedaUSD">USD</label>  <input type="radio" class="form-check-input" name="moneda" id="monedaUSD" value="USD" onchange="cambiaMoneda(this.value);">
+            </div>
+        </div>
+
+
 
 
         <div class="row mb-12">
@@ -960,7 +957,12 @@ function VaciarTodo() {
 
 
 
-
+        <div class="row mb-3">
+            <label for="observacion" class="col-sm-2 col-form-label">Observaci&oacute;n: </label>
+            <div class="col-sm-6">
+            <textarea class="form-control" style="height: 55px" name="observacion" id="observacion"></textarea>
+            </div>
+        </div>
 
         <div class="row mb-3">
             <label class="col-sm-2 col-form-label"></label>

@@ -44,10 +44,47 @@
             return $err;
         }
 
+        function getVenta($cod_venta){
+            $err="OK";
+            $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_ven, t2.num_identificacion, t2.nombre_cliente, t2.direccion_cliente from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) where t1.cod_venta='$cod_venta'";
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);		
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)>0){
+                $this->fecha_ven=$this->mysqli_result($rs,0,'fecha_ven');
+                $this->moneda=$this->mysqli_result($rs,0,'moneda');
+                $this->num_identificacion=$this->mysqli_result($rs,0,'num_identificacion');
+                $this->nombre_cliente=$this->mysqli_result($rs,0,'nombre_cliente');
+                $this->direccion_cliente=$this->mysqli_result($rs,0,'direccion_cliente');
+                $this->tasa_cambio=$this->mysqli_result($rs,0,'tasa_cambio');
+                $this->observacion=$this->mysqli_result($rs,0,'observacion');
+                $this->estado=$this->mysqli_result($rs,0,'estado');
+                $this->motivo_anulacion=$this->mysqli_result($rs,0,'motivo_anulacion');
+                
+            } else {
+            }
+            if ($rs) {}
+            else { $err="X"; }
+            @mysqli_close($con);
+            return $err;
+        }
+
 
         function ActualizarTasaCambio($tasa_cambio) {	
 			$err="OK";	
 			$query="UPDATE tbl_tasa_cambio set tasa_cambio='$tasa_cambio', cod_usuario='".$_SESSION['cod_usuario_log']."', fecha_registro='".date('Y-m-d H:i:s')."' where cod_tasa_cambio='1'";	
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			@mysqli_select_db($con,$this->vardb);
+			$rs=@mysqli_query($con,$query);		
+			if ($rs) {}
+			else { $err='X'; }
+			@mysqli_close($con);
+			return $err;
+		}
+
+        function AnulaVenta($cod_venta, $motivo) {	
+			$err="OK";	
+			$query="UPDATE tbl_ventas set estado='Anulada', motivo_anulacion='$motivo' where cod_venta='$cod_venta'";	
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			@mysqli_select_db($con,$this->vardb);
 			$rs=@mysqli_query($con,$query);		
@@ -206,6 +243,37 @@
 			return $err;
 		}
         //Fin clases Clientes
+
+
+        function detalleVenta($cod_venta){
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);	
+            $query="SELECT t1.*, t2.nombre_producto FROM tbl_ventas_detalle t1 left join tbl_producto t2 on (t1.cod_producto=t2.cod_producto) where t1.cod_venta='$cod_venta' order by t1.cod_venta_detalle ASC";
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)){ 
+                while($obj = @mysqli_fetch_object($rs)) {
+                       $return[] = $obj;
+                }
+            }		
+            @mysqli_close($con);
+            return $return;
+        }
+
+        function detallePAGO($cod_venta){
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);	
+            $query="SELECT t1.*, t2.nombre_banco FROM tbl_ventas_pago t1 left join tbl_banco t2 on (t1.banco=t2.cod_banco)  where t1.cod_venta='$cod_venta' order by t1.cod_venta_pago ASC";
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)){ 
+                while($obj = @mysqli_fetch_object($rs)) {
+                       $return[] = $obj;
+                }
+            }		
+            @mysqli_close($con);
+            return $return;
+        }
+
+        
 
         
 

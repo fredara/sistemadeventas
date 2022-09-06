@@ -63,6 +63,10 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
         );
     })(jQuery);
 
+    function abrirVentana(url) {
+      window.open(url, "nuevo", "directories=no, location=no, menubar=no, scrollbars=yes, statusbar=no, tittlebar=no, width=350, height=660 left=600 top=80");
+    }
+
 
 </script>
 </head>
@@ -157,44 +161,60 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th style="width: 5%; text-align: center;"># Venta</th>
+                        <th style="width: 5%; text-align: center;">Nro Venta</th>
                         <th style="width: 20%; text-align: center;">Cliente</th>
-                        <th style="width: 30%; text-align: center;">Fecha</th>
+                        <th style="width: 20%; text-align: center;">Fecha</th>
+                        <th style="width: 5%; text-align: center;">Estatus</th>
                         <th style="width: 15%; text-align: center;">Total</th>
                         <th style="width: 5%; text-align: center;">Creado Por</th>
-                        <th style="width: 5%; text-align: center;">&nbsp;</th>
+                        <th style="width: 10%; text-align: center;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php 
                         if(!empty($objVentas)) {
 				                  foreach ($objVentas as $obj) {
+                            if ($obj->estado=='Cerrada') {
+                              $class = 'table-success';
+                            }else{
+                              $class = 'table-danger';
+                            }
                     ?>
                         <tr>
-                            <th scope="row"> <?php echo $obj->cod_venta; ?></th>
-                            <td style="text-align: center;"><?php echo $obj->nombre_cliente; ?></td>
-                            <td style="text-align: center;"><?php echo $obj->fecha_vent; ?></td>
-                            <td style="text-align: center;"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
-                            <td style="text-align: center;"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
-                            <td style="text-align: center;">
-                              <!--<div class="card ventacenamiento-card">
+                            <th scope="row" style="text-align: center;" class="<?php echo $class; ?>"> <?php echo $obj->cod_venta; ?></th>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_cliente; ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->fecha_vent; ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->estado; ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>">
+                              <div class="card ventacenamiento-card">
                                 <div class="filter centrar1">
                                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                                     <li class="dropdown-header text-start">
                                       <h6>Opciones</h6>
                                     </li>
-                                    <li><?php echo "<a class='dropdown-item' href='ver_producto.php?cod_producto=".$obj->cod_producto."'>Ver</a>"; ?></li>
+                                    <li><?php echo "<a class='dropdown-item' href='ver_venta.php?cod_venta=".$obj->cod_venta."'>Ver</a>"; ?></li>
 
-                                    <li><?php echo "<a class='dropdown-item' href='modificar_producto.php?cod_producto=".$obj->cod_producto."'>Actualizar</a>"; ?></li>
-                                    <?php if($grupo==1){ ?>
-                                      <li><?php echo "<a class='dropdown-item' href='ajustar_producto.php?cod_producto=".$obj->cod_producto."'>Ajuste</a>"; ?></li>
-
-                                      <li><?php echo "<a class='dropdown-item' href='precio_producto.php?cod_producto=".$obj->cod_producto."'>Precio</a>"; ?></li>
+                                    <?php  //if ($obj->estado=='Cerrada') { 
+                                            if (false) {?>
+                                      <li><?php //echo "<a class='dropdown-item' href='javascript:abrirVentana('venta_imprimir.php?cod_venta=".$obj->cod_venta."')'>Imprimir</a>"; ?>
+                                        <a class='dropdown-item' href="javascript:abrirVentana('venta_imprimir.php?cod_venta=<?php echo $obj->cod_venta;?>')">Imprimir</a>
+                                      </li>
                                     <?php } ?>
+
+                                    <?php if ($obj->estado=='Cerrada') {
+                                      //href="./controller/Ventas.controller.php?cod_venta=<?php echo $obj->cod_ventaoperacion=anulaVenta" 
+                                    ?>
+                                    <li>
+                                      <a class='dropdown-item' href="./anular_venta.php?cod_venta=<?php echo $obj->cod_venta;?>">Anular</a>
+                                    </li>
+                                    <?php } ?>
+                                    
                                   </ul>
                                 </div>
-                              </div>-->
+                              </div>
                             </td>
                         </tr>
                     <?php

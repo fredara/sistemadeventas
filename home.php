@@ -122,10 +122,9 @@
                       <h6>Opciones</h6>
                     </li>
 
-                    <!--<li><a class="dropdown-item" href="registro_ventas.php">Registrar</a></li>
-                    <li><a class="dropdown-item" href="listar_ventas.php">Lista</a></li>-->
-                    <li><a class="dropdown-item" href="#">Registrar</a></li>
-                    <li><a class="dropdown-item" href="#">Lista</a></li>
+                    <li><a class="dropdown-item" href="registro_ventas.php">Registrar</a></li>
+                    <li><a class="dropdown-item" href="listar_ventas.php">Lista</a></li>
+                    
                   </ul>
                 </div>
 

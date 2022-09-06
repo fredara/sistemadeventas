@@ -2,6 +2,7 @@
     session_start();
     extract($_REQUEST);
     require_once("../clases/ventas.php");
+    require_once("../clases/almacen.php");
     require_once("../clases/utilidades.php");
     require_once("../clases/log.php");
 
@@ -11,6 +12,7 @@
             if (!empty($fecha_venta) and !empty($moneda) and !empty($tasa_cambio) and !empty($tipo_identidad) and !empty($cod_producto[0]) and !empty($cantidad[0]) and !empty($precioxuni[0]) and !empty($precio[0]) and !empty($moneda_pago[0]) and !empty($instru_p[0]) and !empty($monto_p[0])) {
 
                 $vent = new Ventas();
+                $alm = new Almacen();
 
                 //Guarda el documento del cliente asociado a los datos
                 if ($tipo_identidad=='cedula')	$num_identificacion = $num_cedula;
@@ -52,9 +54,13 @@
                     header("Location:../registro_ventas.php?err=$err");  
                     break;
                 }else{
+                    $fecha_ajuste = date("Y-m-d");
+                    $tipo_ajuste = 'Decremento';
+                    $concepto_ajuste = 'Venta Numero '.$vent->cod_venta.' Registrada, Descuento de inventario';
+
 
                     //guarda el detalle de la venta
-                    $iva = 16;
+                    $iva_n = 16;
                     $iva_r = 10;
                     $i=count($cod_producto);
                     for ($j=0;$j<$i;$j++) {
@@ -63,9 +69,9 @@
                             $cantidad_precio = $precioxuni[$j]*$cantidad[$j];
 
                             $total_pedido += $cantidad_precio;
-                            if ($iva[$j]==$iva) {
+                            if ($iva[$j]==$iva_n) {
                                 $subtotal=$subtotal+$cantidad_precio;
-                                $porcentaje_iva=$iva;
+                                $porcentaje_iva=$iva_n;
                             } elseif ($iva[$j] == $iva_r) {
                                 $subtotal_r=$subtotal_r+$cantidad_precio;
                                 $porcentaje_iva=$iva_r;
@@ -73,11 +79,17 @@
                                 $exento=$exento+$cantidad_precio;
                                 $porcentaje_iva="";
                             }
-                            $vent->saveDetalleVenta($vent->cod_venta, $cod_producto[$j], $cantidad[$j], $precioxuni[$j], $porcentaje_iva);
+                            $guardaDetalle = $vent->saveDetalleVenta($vent->cod_venta, $cod_producto[$j], $cantidad[$j], $precioxuni[$j], $porcentaje_iva);
+                            if ($guardaDetalle=='OK') {
+                                $decrementa = $alm->decrementaExistencia($cod_producto[$j], $cantidad[$j]);
+                                if ($decrementa=='OK') {
+                                    $alm->addAjusteProd($cod_producto[$j], $fecha_ajuste, $tipo_ajuste, $cantidad[$j], $concepto_ajuste);
+                                }
+                            }
                         }
                     }
                     
-                    $iva=($subtotal*$iva)/100;
+                    $iva=($subtotal*$iva_n)/100;
                     $iva=round($iva,2);
                     $iva_r=($subtotal_r*$iva_r)/100;
                     $iva_r=round($iva_r,2);
@@ -113,9 +125,53 @@
             }
         break;
 
+        case "anulaVenta":
+            if (!empty($cod_venta)) {
+                $vent = new Ventas();	
+                $vent->getVenta($cod_venta);
+
+                $anulado = $vent->AnulaVenta($cod_venta, $motivo);
+                if ($anulado!='OK') {
+                    $err = "Error al Anular la Venta, Contacte al administrador del sistema";
+                    header("Location:../listar_ventas.php?err=$err");  
+                    break;
+                }else{
+                    $alm = new Almacen();	
+                    $fecha_ajuste = date("Y-m-d");
+                    $tipo_ajuste = 'Incremento';
+                    $concepto_ajuste = 'Venta Numero '.$cod_venta.' Anulada, Reposicion de inventario';
+                    $listaDetalle = $vent->detalleVenta($cod_venta);
+                    if (!empty($listaDetalle)) {
+                        foreach ($listaDetalle as $obj) {
+                            $incrementa = $alm->incrementaExistencia($obj->cod_producto, $obj->cantidad);
+                            if ($incrementa=='OK') {
+                                $alm->addAjusteProd($obj->cod_producto, $fecha_ajuste, $tipo_ajuste, $obj->cantidad, $concepto_ajuste);
+                            }
+                        }
+                    }
+                    // REGISTRO Log
+                    $log = new Log();
+                    $uti = new Utilidades();
+                    $descripcion="Se Anuló la Venta numero $cod_venta";
+                    $fecha_hora=date("Y-m-d H:i:s");
+                    $ip=$uti->getIP();
+                    $log->addLog($_SESSION['cod_usuario_log'], $descripcion, $fecha_hora, $ip, "Ventas");
+                    $err="La Venta se ha Anulado de forma exitosa";
+                    header("Location:../listar_ventas.php?err=$err&tp=e");
+                }
+
+            }else{
+                $err = "Falla al Seleccionar Venta, Contacte al administrador del sistema";
+                header("Location:../listar_ventas.php?err=$err");    
+            }
+        break;
+
+       
+
 
         default:
-            header("Location:../index.php");
+            //header("Location:../index.php");
+            echo "alsjkdad";
 	    break; 
     }
 ?>

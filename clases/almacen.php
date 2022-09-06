@@ -30,14 +30,20 @@
 			return $err;
 		}
 
-		function listarProductos($pag, $regxpag){
+		function listarProductos($nombre_producto, $codigo_producto, $pag, $regxpag){
 				if (empty($pag)) $pag=1;
 				if (empty($regxpag)) $regxpag=15;
 				$inic = ($pag * $regxpag) - $regxpag;
 				$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 				@mysqli_select_db($con,$this->vardb);	
 				mysqli_set_charset($con, "utf8");
-				$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario)  ORDER BY t1.cod_producto desc LIMIT $inic, $regxpag";
+				if (!empty($nombre_producto)) {
+					$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario) where t1.nombre_producto like '%$nombre_producto%'  ORDER BY t1.nombre_producto asc LIMIT $inic, $regxpag";
+				}elseif (!empty($codigo_producto)) {
+					$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario) where t1.codigo_producto='$codigo_producto'  ORDER BY t1.nombre_producto asc LIMIT $inic, $regxpag";
+				}else{
+					$query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, t4.nombre_usuario, t4.apellido_usuario FROM tbl_producto t1 left join tbl_usuario t4 on (t1.cod_usuario_creo=t4.cod_usuario)  ORDER BY t1.nombre_producto asc LIMIT $inic, $regxpag";
+				}
 				$rs=@mysqli_query($con,$query);
 				if (@mysqli_num_rows($rs)){
 				$query="SELECT FOUND_ROWS()";
@@ -284,6 +290,30 @@
 			$query="UPDATE tbl_producto set codigo_producto='$codigo_producto', nombre_producto='$nombre_producto', descripcion='$descripcion', marca='$marca', cod_foto='$cod_foto', cod_foto='$cod_foto'  WHERE cod_producto='$cod_producto'";
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			mysqli_set_charset($con, "utf8");
+			@mysqli_select_db($con,$this->vardb);
+			$rs=@mysqli_query($con,$query);		
+			if ($rs) {}
+			else { $err='X'; }
+			@mysqli_close($con);
+			return $err;
+		}
+
+		function decrementaExistencia($cod_producto, $cantidad) {
+			$err="OK";
+			$query="UPDATE tbl_producto set cantidad=cantidad - $cantidad WHERE cod_producto='$cod_producto'";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+			@mysqli_select_db($con,$this->vardb);
+			$rs=@mysqli_query($con,$query);		
+			if ($rs) {}
+			else { $err='X'; }
+			@mysqli_close($con);
+			return $err;
+		}
+
+		function incrementaExistencia($cod_producto, $cantidad) {
+			$err="OK";
+			$query="UPDATE tbl_producto set cantidad=cantidad + $cantidad WHERE cod_producto='$cod_producto'";
+			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			@mysqli_select_db($con,$this->vardb);
 			$rs=@mysqli_query($con,$query);		
 			if ($rs) {}

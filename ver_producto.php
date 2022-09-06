@@ -2,8 +2,10 @@
   extract($_REQUEST);
   require_once("./inc/sesion.php");
   require_once("./clases/almacen.php");
+  require_once("./clases/archivo.php");
   $alm = new Almacen();
   $alm->getProducto($cod_producto);
+  $arch = new Archivo();	
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -186,9 +188,15 @@
                 if (!empty($alm->nombre_archivo)) { 
               ?>
                   <img src="images/productos/<?php echo $alm->nombre_archivo;?>" width="250" hspace="0" vspace="0" alt="Foto Producto">
-              <?php }else{ ?>
+              <?php }else{ $objImagenes = $arch->getImagenesProducto($cod_producto); 
+                if (!empty($objImagenes)) { 
+                  foreach ($objImagenes as $obj) {
+              ?>
+                  <img src="images/productos/<?php echo $obj->nombre_archivo;?>" width="250" hspace="0" vspace="0" alt="Foto Producto<?php echo $obj->cod_foto; ?>">
+
+              <?php }}else{?>
                   <img src="images/productos/sinfoto.jpg" width="90" hspace="0" vspace="0"/>
-              <?php } ?>
+              <?php } }?>
             </label>
         </div>
 

@@ -4,6 +4,9 @@
   require_once("./clases/almacen.php");
   $alm = new Almacen();
   $alm->getProducto($cod_producto);
+
+  require_once("./clases/archivo.php");
+  $arch = new Archivo();	
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,6 +82,17 @@
         );
     })(jQuery);
 
+    let cant_foto = 1;
+    function agregar_foto(){
+      cant_foto=cant_foto+1;
+      $("#foto_inicial").append('<div class="row mb-3 foto_inicial'+cant_foto+'"><label for="archivo'+cant_foto+'" class="col-sm-2 col-form-label">Otra Imagen </label><div class="col-sm-6"><input class="form-control" type="file" id="archivo'+cant_foto+'" name="archivo[]"><a href="#b" onclick="javascript:borrar_foto('+cant_foto+');" class="badge border-danger border-1 text-danger">Borrar</a></div></div></div>');
+    }
+
+    function borrar_foto(cual) {
+      $("div.foto_inicial"+cual).remove();
+      return false;
+    }
+
 
 </script>
 <script type="text/javascript">
@@ -140,8 +154,8 @@
       <!-- Error -->
         <?php if(!empty($err)){ ?> 
           <div class="row mb-3">
-            <div class="col-sm-8">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="col-sm-12">
+                <div <?php if($tp=='e'){ ?> class="alert alert-success alert-dismissible fade show" <?php }else{ ?> class="alert alert-danger alert-dismissible fade show" <?php } ?>  role="alert">
                   <?php echo $err;  ?> 
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -202,23 +216,32 @@
             </div>
         </div>
 
-        <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Actualizar Foto:</label>
+        
+        <div class="row mb-3" id="foto_inicial">
+            <label for="archivo" class="col-sm-2 col-form-label">Agregar Foto</label>
             <div class="col-sm-6">
-            <input class="form-control" type="file" id="archivo" name="archivo">
+              <input class="form-control" type="file" id="archivo0" name="archivo[]">
+              <a name="a" id="a"></a><a href="javascript:agregar_foto();" class="enlace1">Agregar otra</a>
             </div>
         </div>
+
         <div class="row mb-3">
-            <label for="archivo" class="col-sm-2 col-form-label">Foto</label>
-            <div class="col-sm-6">
+            <label for="archivo" class="col-sm-8 col-form-label">
               <?php
                 if (!empty($alm->nombre_archivo)) { 
               ?>
                   <img src="images/productos/<?php echo $alm->nombre_archivo;?>" width="250" hspace="0" vspace="0" alt="Foto Producto">
-              <?php }else{ ?>
+              <?php }else{ $objImagenes = $arch->getImagenesProducto($cod_producto); 
+                if (!empty($objImagenes)) { 
+                  foreach ($objImagenes as $obj) {
+              ?>
+                  <img src="images/productos/<?php echo $obj->nombre_archivo;?>" width="250" hspace="0" vspace="0" alt="Foto Producto<?php echo $obj->cod_foto; ?>" style="padding: 12px;">
+                  <a name="a" id="a"></a><a href="./controller/Almacen.controller.php?operacion=elimFoto&cod_foto=<?php echo $obj->cod_foto?>&cod_producto=<?php echo $cod_producto?>" class="badge border-danger border-1 text-danger">Eliminar</a>
+
+              <?php }}else{?>
                   <img src="images/productos/sinfoto.jpg" width="90" hspace="0" vspace="0"/>
-              <?php } ?>
-            </div>
+              <?php } }?>
+            </label>
         </div>
 
         <div class="row mb-3">

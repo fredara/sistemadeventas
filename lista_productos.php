@@ -5,7 +5,7 @@ require_once("./clases/almacen.php");
 if (empty($regxpag))  $regxpag=30;
 if (empty($pag)) $pag=1;
 $alm = new Almacen();
-$objProductos= $alm->listarProductos($pag, $regxpag);
+$objProductos= $alm->listarProductos($nombre_producto, $codigo_producto, $pag, $regxpag);
 $total_paginas=ceil($alm->total/$regxpag);
 
 $grupo= $_SESSION['cod_grupo_usuario_log'];
@@ -52,6 +52,17 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
   <link href="assets/css/style.css" rel="stylesheet">
   <script type="text/javascript">
     $(document).ready(function() {
+      $("#nombre_producto").keyup(
+        function() {
+        valor = $("#nombre_producto").val();
+        $("#nombre_producto").val(valor.toUpperCase());
+      });
+
+      $("#codigo_producto").keyup(
+        function() {
+        valor = $("#codigo_producto").val();
+        $("#codigo_producto").val(valor.toUpperCase());
+      });
 
 
     });
@@ -62,6 +73,20 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
             }
         );
     })(jQuery);
+
+    function cambiaBuscar(val){
+      if (val=='Nombre') {
+        document.getElementById('nombre_producto').style.display = 'inline';
+      }else{
+        document.getElementById('nombre_producto').style.display = 'none';
+      }
+
+      if (val=='Codigo') {
+        document.getElementById('codigo_producto').style.display = 'inline';
+      }else{
+        document.getElementById('codigo_producto').style.display = 'none';
+      }
+    }
 
 
 </script>
@@ -144,8 +169,43 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
         <ol class="breadcrumb">
           <li class="breadcrumb-item active"><a href="registrar_producto.php">Registrar Producto </a></li>
         </ol>
+        <ol class="breadcrumb">
+          
+         
+          <li>
+            
+
+            
+          </li>
+          <li>
+            
+          </li>
+          
+        </ol>
       </nav>
     </div><!-- End Page Title -->
+
+    <div class="container breadcrumb">
+      <div class="row mb-12">
+        <div class="col-lg-12">
+          <form action="lista_productos.php" method="post"> 
+            <label class="breadcrumb-item active">Buscar por:</label>
+
+            <select class="form-select" name="buscar_por" id="buscar_por" onchange="cambiaBuscar(this.value);" style="display: inline !important; width: auto !important;">
+              <option value="Seleccione">Seleccione</option>
+              <option value="Codigo">C&oacute;digo</option>
+              <option value="Nombre">Nombre</option>
+            </select>
+
+            <input class="form-control" type="text" name="nombre_producto" id="nombre_producto" style="display: none; width: auto !important;">
+
+            <input class="form-control" type="text" name="codigo_producto" id="codigo_producto" style="display: none; width: auto !important;">
+
+            <button type="submit" class="btn btn-primary" id="btn_buscar">Buscar</button>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <section class="section dashboard">
         <div class="row mb-3">
@@ -157,13 +217,12 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th style="width: 5%; text-align: center;"># Item</th>
                         <th style="width: 20%; text-align: center;">C&oacute;digo Producto</th>
                         <th style="width: 30%; text-align: center;">Nombre</th>
                         <th style="width: 15%; text-align: center;">Marca</th>
                         <th style="width: 5%; text-align: center;">Existencia</th>
                         <th style="width: 10%; text-align: center;">Precio</th>
-                        <th style="width: 5%; text-align: center;">&nbsp;</th>
+                        <th style="width: 20%; text-align: center;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,13 +231,12 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
 				                  foreach ($objProductos as $obj) {
                     ?>
                         <tr>
-                            <th scope="row"> <?php echo $obj->cod_producto; ?></th>
                             <td style="text-align: center;"><?php echo $obj->codigo_producto; ?></td>
                             <td style="text-align: center;"><?php echo $obj->nombre_producto; ?></td>
                             <td style="text-align: center;"><?php echo $obj->marca; ?></td>
                             <td style="text-align: center;"><?php echo $obj->cantidad; ?></td>
                             <td style="text-align: center;"><?php echo @number_format($obj->precio, 2, ',', '.'); echo " $"; ?></td>
-                            <td style="text-align: center;">
+                            <td style="text-align: left;">
                               <div class="card almacenamiento-card">
                                 <div class="filter centrar1">
                                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>

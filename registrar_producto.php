@@ -75,6 +75,16 @@
             }
         );
     })(jQuery);
+    let cant_foto = 1;
+    function agregar_foto(){
+      cant_foto=cant_foto+1;
+      $("#foto_inicial").append('<div class="row mb-3 foto_inicial'+cant_foto+'"><label for="archivo" class="col-sm-2 col-form-label">Otra Imagen </label><div class="col-sm-6"><input class="form-control" type="file" id="archivo'+cant_foto+'" name="archivo[]"><a href="#b" onclick="javascript:borrar_foto('+cant_foto+');">Borrar</a></div></div></div>');
+    }
+
+    function borrar_foto(cual) {
+      $("div.foto_inicial"+cual).remove();
+      return false;
+    }
 
 
 </script>
@@ -197,10 +207,11 @@
             </div>
         </div>
 
-        <div class="row mb-3">
+        <div class="row mb-3" id="foto_inicial">
             <label for="archivo" class="col-sm-2 col-form-label">Subir Imagen</label>
             <div class="col-sm-6">
-            <input class="form-control" type="file" id="archivo" name="archivo">
+              <input class="form-control" type="file" id="archivo0" name="archivo[]">
+              <a name="a" id="a"></a><a href="javascript:agregar_foto();" class="enlace1">Agregar otra</a>
             </div>
         </div>
 

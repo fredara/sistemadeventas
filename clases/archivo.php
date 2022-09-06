@@ -10,13 +10,14 @@ class Archivo{
 		include ("conexion.php");
 	}
 	
-    function addFotoProd($nombre_archivo, $nombretmp_archivo, $directorio_archivo, $extension_archivo, $tipo_archivo){
+    function addFotoProd($nombre_archivo, $nombretmp_archivo, $directorio_archivo, $extension_archivo, $tipo_archivo, $cod_producto){
 		$err="OK";
 		if (!is_dir($directorio_archivo)) {
 			$this->mkdir_r($directorio_archivo,0777);
 		}
 		move_uploaded_file($nombretmp_archivo, $directorio_archivo.'/'.$nombre_archivo);
-		$query="insert into tbl_foto_producto (nombre_archivo, extension_archivo, directorio_archivo, tipo_archivo) values ('$nombre_archivo', '$extension_archivo', '$directorio_archivo', '$tipo_archivo')";
+		$query="insert into tbl_foto_producto (nombre_archivo, extension_archivo, directorio_archivo, tipo_archivo, cod_producto) values ('$nombre_archivo', '$extension_archivo', '$directorio_archivo', '$tipo_archivo', '$cod_producto')";
+		echo $query;
 		$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
         mysqli_set_charset($con, "utf8");
 		@mysqli_select_db($con,$this->vardb);
@@ -43,6 +44,22 @@ class Archivo{
 			$return = "OK";
 		}else{
 			$return = "X";
+		}
+		@mysqli_close($con);
+		return $return;
+	}
+
+	function getImagenesProducto($cod_producto){
+		$query="SELECT t1.* FROM tbl_foto_producto t1 where t1.cod_producto='$cod_producto' ORDER BY t1.cod_foto ASC";
+		$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+		@mysqli_select_db($con,$this->vardb);	
+		mysqli_set_charset($con, "utf8");
+		$rs=@mysqli_query($con,$query);
+		$this->t_prod_categ=@mysqli_num_rows($rs);
+		if (@mysqli_num_rows($rs)){
+			while($obj = @mysqli_fetch_object($rs)) {
+				$return[] = $obj;
+			}
 		}
 		@mysqli_close($con);
 		return $return;
