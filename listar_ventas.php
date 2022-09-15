@@ -220,7 +220,7 @@ if(empty($cod_venta)){
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_cliente; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->fecha_vent; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->estado; ?></td>
-                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BSS') {echo " BS";}else{echo " $";} ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>">
                               <div class="card ventacenamiento-card">

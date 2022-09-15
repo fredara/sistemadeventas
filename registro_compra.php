@@ -174,114 +174,6 @@
       }
   }
 
-  function CargaDataProduct(str, campo) {
-    if (str==null) {
-      str = document.getElementById('cod_producto'+campo).value;
-    }
-    var Moneda = '';
-    if(document.getElementById('monedaBSS').checked == true ){
-      Moneda = 'BS';
-    }else{
-      Moneda = 'USD';
-    }
-    let tasa_cambio = document.getElementById('tasa_cambio').value;
-    if (tasa_cambio=='') {
-      alert("Debe Ingresar la Tasa de Cambio");
-      return;
-    }
-  
-    selec = "cod_producto"+campo;
-    
-      var xmlhttp;
-      if (window.XMLHttpRequest){
-        xmlhttp=new XMLHttpRequest();
-      }else{
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-      }
-      
-      xmlhttp.onreadystatechange=function(){
-        if (xmlhttp.readyState==4 && xmlhttp.status==200){
-          var resultado = xmlhttp.responseText
-          //console.log(resultado);
-          verificaExistencia(str, campo);
-          if (resultado=='Producto sin Precio') {
-            document.getElementById("mens"+campo).innerHTML=resultado;
-            document.getElementById("cantidad"+campo).value='';
-            document.getElementById("precioxuni"+campo).value='';
-            document.getElementById("precio"+campo).value='';
-          }else{
-            if(Moneda=='USD'){
-              var precio = 1*resultado;
-              var pre = precio.toFixed(2);
-
-              //console.log(resultado);
-              var resul = parseFloat(resultado);
-            }else{
-              var precio = 1*(resultado*tasa_cambio);
-              var pre = precio.toFixed(2);
-
-              //console.log(resultado);
-              var resul = parseFloat(resultado*tasa_cambio);
-            }
-            resul = number_format(resul,2,'.','');
-            document.getElementById("cantidad"+campo).value=1;
-            document.getElementById("precioxuni"+campo).value= resul;
-            document.getElementById("precio"+campo).value=pre;
-            document.getElementById("mens"+campo).innerHTML='';
-
-          }
-          
-        }
-      }
-      
-    
-      //console.log(cod_ruta);
-      data="&cod_producto="+str+"&operacion=1";
-      xmlhttp.open("POST","inc/combo4.php",true);
-      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-      xmlhttp.send(data);
-    
-  }
-
-  function verificaExistencia(cod_producto, campo){
-    var xmlhttp;
-    if (window.XMLHttpRequest){// code for IE7+, Firefox, Chrome, Opera, Safari
-      xmlhttp=new XMLHttpRequest();
-    }else{// code for IE6, IE5
-      xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange=function(){
-      if (xmlhttp.readyState==4 && xmlhttp.status==200){
-        var resultado = xmlhttp.responseText
-        var resultado = JSON.parse(resultado);
-        //console.log(resultado);
-        if (resultado.existencia<=0) {
-          //no es posible no hay en inventario
-
-          document.getElementById('cod_producto'+campo).value='';
-          document.getElementById("mens"+campo).innerHTML='Falla de Inventario';
-          document.getElementById("cantidad"+campo).value='';
-          document.getElementById("precioxuni"+campo).value='';
-          document.getElementById("precio"+campo).value='';
-
-          /*document.getElementById("bulto"+campo).checked=true;
-          document.getElementById("individual"+campo).checked=false;*/
-          alert(`NO ES POSIBLE CARGAR ESTE PRODUCTO. FALLA DE INVENTARIO ${resultado.existencia}`);
-
-        }else{
-          cantidad_permitida[campo] = resultado.existencia;
-          document.getElementById("mens"+campo).innerHTML='Existencia en Almacen ('+resultado.existencia+') Unidades. Precio $ ('+resultado.precio_almacen+')';
-          //nada Todo bien
-          
-        }
-      }
-    }
-  
-    data="cod_producto="+cod_producto;
-    xmlhttp.open("POST","inc/verficiaExistenciaProducto.php",true);
-    xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-    xmlhttp.send(data);
-  }
 
   function sumacampos(id) {
     let cantidad_precio = 0;
@@ -349,7 +241,6 @@
     }
     document.getElementById('info_monto_cambio').innerHTML = number_format(info_cambio,2,'.','')+" "+mon;
 
-    PagoRegistrado(pag);
   }
 
   function limtCant(campo, elemt){
@@ -391,7 +282,7 @@ function agregar() {
 	ven=ven+1;
 	m=m+1;
   var lista_productos = '<?php echo $lista_productos;?>';
-	 $("#tabla_detalle").append('<div class="row mb-12 deta'+ven+' espacio" ><div class="col-sm-4"><select name="cod_producto[]" id="cod_producto'+ven+'" onchange="CargaDataProduct(this.value, '+ven+'); sumacampos('+ven+');" onblur="sumacampos('+ven+');" class="form-select" required><option value="">Seleccione</option>'+lista_productos+'</select>&nbsp; &nbsp;<input name="nombre_pro'+ven+'" type="text" class="boton_busqueda form-control" id="nombre_pro'+ven+'" size="20" placeholder="Buscar Producto" onblur="CargaDataProduct(null, '+ven+');" /><span id="mens'+ven+'" class="badge border-danger border-1 text-danger"></span></div><div class="col-sm-1"><input type="text" class="form-control" name="cantidad[]" id="cantidad'+ven+'" onkeyup="sumacampos('+ven+'); limtCant('+ven+', this);" onblur="sumacampos('+ven+'); limtCant('+ven+', this);" alt="Integer2" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precioxuni[]" id="precioxuni'+ven+'" onkeyup="sumacampos('+ven+');" alt="Costo" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precio[]" id="precio'+ven+'" required readonly></div><div class="col-sm-2"><label for="iva1'+ven+'">16%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva1'+ven+'" value="16" onchange="sumacampos('+ven+');"><label for="iva2'+ven+'">10%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva2'+ven+'" value="10" onchange="sumacampos('+ven+');"><label for="iva3'+ven+'">N/A</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva3'+ven+'" value="0" checked required onchange="sumacampos('+ven+');"></div><div class="col-sm-1"><a href="#b" onclick="javascript:borrar('+ven+');sumacampos_d('+ven+');">Borrar</a></div></div>');
+	 $("#tabla_detalle").append('<div class="row mb-12 deta'+ven+' espacio" ><div class="col-sm-4"><select name="cod_producto[]" id="cod_producto'+ven+'" onchange="sumacampos('+ven+');" onblur="sumacampos('+ven+');" class="form-select" required><option value="">Seleccione</option>'+lista_productos+'</select>&nbsp; &nbsp;<input name="nombre_pro'+ven+'" type="text" class="boton_busqueda form-control" id="nombre_pro'+ven+'" size="20" placeholder="Buscar Producto" /><span id="mens'+ven+'" class="badge border-danger border-1 text-danger"></span></div><div class="col-sm-1"><input type="text" class="form-control" name="cantidad[]" id="cantidad'+ven+'" onkeyup="sumacampos('+ven+'); limtCant('+ven+', this);" onblur="sumacampos('+ven+'); limtCant('+ven+', this);" alt="Integer2" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precioxuni[]" id="precioxuni'+ven+'" onkeyup="sumacampos('+ven+');" alt="Costo" required></div><div class="col-sm-2"><input type="text" class="form-control" name="precio[]" id="precio'+ven+'" required readonly></div><div class="col-sm-2"><label for="iva1'+ven+'">16%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva1'+ven+'" value="16" onchange="sumacampos('+ven+');"><label for="iva2'+ven+'">10%</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva2'+ven+'" value="10" onchange="sumacampos('+ven+');"><label for="iva3'+ven+'">N/A</label>  <input type="radio" class="form-check-input" name="iva[]'+ven+'" id="iva3'+ven+'" value="0" checked required onchange="sumacampos('+ven+');"></div><div class="col-sm-1"><a href="#b" onclick="javascript:borrar('+ven+');sumacampos_d('+ven+');">Borrar</a></div></div>');
 
    var opts_pro = $('#cod_producto'+ven+' option').map(function () {
       return [[this.value, $(this).text()]];
@@ -415,141 +306,6 @@ function borrar(cual) {
 }
 
 
-
-
-let pag = 1; 
-let campo_pagos=1;
-function agregar_pago(){
-  pag=pag+1;
-  var lista_comboBanco = '<?php echo $lista_comboBanco;?>';
-    $("#tabla_detalle_pago").append('<div class="row mb-12 deta_pago'+pag+'"><div class="col-sm-2"><select class="form-select" name="moneda_pago[]" aria-label="Default select example" id="moneda'+pag+'" required onchange="mostrarppago(this);"><option value="">--</option><option value="BS">Bolivares</option><option value="USD">Dolares</option></select></div><div class="col-sm-2"><select class="form-select" name="instru_p[]" aria-label="Default select example" id="instru_p'+pag+'" required><option value="" selected>--</option><option value="Cheque" id="cheque'+pag+'">Cheque</option><option value="Deposito" id="deposito'+pag+'">Depósito</option><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta de Debito" id="tdd'+pag+'">Tarjeta de Débito</option><option value="Tarjeta de Credito" id="tdc'+pag+'">Tarjeta de Crédito</option><option value="Zelle" id="zelle'+pag+'">Zelle</option><option value="Pago Movil" id="pagomovil'+pag+'">Pago Movil</option></select></div><div class="col-sm-2"><select class="form-select" name="banco_p[]" aria-label="Default select example" id="banco_p'+pag+'"><option value="" selected>--</option>'+lista_comboBanco+'</select></div><div class="col-sm-2"><input type="number" class="form-control" name="numero_p[]" id="numero_p'+pag+'"></div><div class="col-sm-2"><input type="text" class="form-control" name="monto_p[]" id="monto_p'+pag+'" onkeyup="PagoRegistrado('+pag+');" alt="Costo" required></div><div class="col-sm-1"><a href="#b" onclick="javascript:borrar_detaPago('+pag+');PagoRegistrado('+pag+');">Borrar</a></div></div>');
-
-}
-
-function borrar_detaPago(cual) {
-	$("div.deta_pago"+cual).remove();
-	return false;
-}
-
-
-
-
-
-
-
-function mostrarppago(val){
-  var id = val.id;
-  var res = id.replace("moneda", "");
-  //console.log(res);
-
-  if(val.value=='BSS'){
-    document.getElementById("cheque"+res).disabled = false;
-    document.getElementById("deposito"+res).disabled = false;
-    document.getElementById("tdd"+res).disabled = false;
-    document.getElementById("tdc"+res).disabled = false;
-    document.getElementById("zelle"+res).disabled = true;
-    document.getElementById("pagomovil"+res).disabled = false;
-
-  } 
-  if(val.value=='USD'){
-    document.getElementById("cheque"+res).disabled = true;
-    document.getElementById("deposito"+res).disabled = true;
-    document.getElementById("tdd"+res).disabled = true;
-    document.getElementById("tdc"+res).disabled = true;
-    document.getElementById("pagomovil"+res).disabled = true;
-  }
-  if(val.value=='USD'){
-    document.getElementById("zelle"+res).disabled = false;
-  }
-  if(val.value=='BSS'){
-    document.getElementById("zelle"+res).disabled = true;
-  }
-
-  document.getElementById("instru_p"+res).value = "";
-  document.getElementById("banco_p"+res).value = "";
-  document.getElementById("numero_p"+res).value = "";
-  document.getElementById("monto_p"+res).value = "";
-
-}
-
-
-function PagoRegistrado(id_pago){
-  let TotalAPagar = document.getElementById('total').value;
-  if(TotalAPagar==''){TotalAPagar=0;}
-  TotalAPagar = TotalAPagar.replace(",", ""); 
-  let TotalPagado_BS = 0;
-  let TotalPagado_USD = 0;
-
-  let faltante_bs = 0;
-  let faltante_usd = 0;
-
-  let tasa_cambio = parseFloat(document.getElementById('tasa_cambio').value);
-  if(id_pago>=campo_pagos)
-      campo_pagos=campo_pagos+1;
-  for (let i = 0; i < campo_pagos; i++) {
-    if(document.getElementById('monto_p'+i)) {
-    if(document.getElementById('monto_p'+i).value != '') {
-      if(document.getElementById('moneda'+i).value  == 'USD'){
-        TotalPagado_USD = TotalPagado_USD + parseFloat(document.getElementById('monto_p'+i).value);
-
-        //TotalPagado_BS = TotalPagado_BS + (parseFloat(document.getElementById('monto_p'+i).value) * tasa_cambio );
-      }else{
-        TotalPagado_BS = TotalPagado_BS + parseFloat(document.getElementById('monto_p'+i).value);
-
-        //TotalPagado_USD = TotalPagado_USD + (parseFloat(document.getElementById('monto_p'+i).value) / tasa_cambio);
-      }
-    }
-    }
-  }
-
-
-
-  if (TotalPagado_BS>0) {
-    if(document.getElementById('monedaBSS').checked == true ){
-      faltante_bs = TotalAPagar - TotalPagado_BS - (TotalPagado_USD*tasa_cambio);
-    }else{
-      faltante_bs = (TotalAPagar*tasa_cambio) - TotalPagado_BS - (TotalPagado_USD*tasa_cambio);
-    }
-    
-    if(faltante_bs<=0){
-      document.getElementById("registrar_venta").disabled = false;
-      //if(faltante_bs<0){faltante_bs=0;}
-    }
-  }
-
-    if (TotalPagado_USD>0) {
-      if(document.getElementById('monedaBSS').checked == true ){
-        faltante_usd = (TotalAPagar/tasa_cambio) - TotalPagado_USD - (TotalPagado_BS/tasa_cambio);
-      }else{
-        faltante_usd = TotalAPagar - TotalPagado_USD - (TotalPagado_BS/tasa_cambio);
-      }
-      if(faltante_usd<=0){
-        document.getElementById("registrar_venta").disabled = false;
-        //if(faltante_usd<0){faltante_usd=0;}
-      }
-    }
-  
-
-
-  document.getElementById("total_pagadoBS").value = number_format(TotalPagado_BS,2,'.','');
-  document.getElementById("total_pagadoUSD").value = number_format(TotalPagado_USD,2,'.','');
-  if(faltante_bs<0){
-    document.getElementById("faltante_bs_msg").innerHTML = "Vuelto: "+number_format(faltante_bs*-1,2,'.','')+" BS";
-  }else{
-    document.getElementById("faltante_bs_msg").innerHTML = "Resta: "+number_format(faltante_bs,2,'.','')+" BS";
-  }
-
-  if(faltante_usd<0){
-    document.getElementById("faltante_usd_msg").innerHTML = "Vuelto: "+number_format(faltante_usd*-1,2,'.','')+" $";
-  }else{
-    document.getElementById("faltante_usd_msg").innerHTML = "Resta: "+number_format(faltante_usd,2,'.','')+" $";
-  }
-
-  if(TotalPagado_BS==0 && TotalPagado_USD==0){
-    document.getElementById("faltante_bs_msg").innerHTML = "";
-    document.getElementById("faltante_usd_msg").innerHTML = "";
-  }
-}
 
 function VaciarTodo() {
   for(var i=0; i <= ven; i++) {

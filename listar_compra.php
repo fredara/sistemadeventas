@@ -6,7 +6,7 @@ if (empty($regxpag))  $regxpag=30;
 if (empty($pag)) $pag=1;
 $comp = new Compra();
 $objCompras= $comp->listaCompras($numero_compra, $pag, $regxpag);
-$total_paginas=ceil($vent->total/$regxpag);
+$total_paginas=ceil($comp->total/$regxpag);
 
 $grupo= $_SESSION['cod_grupo_usuario_log'];
 ?>
@@ -212,7 +212,7 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_proveedor; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->fecha_comp; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->estado; ?></td>
-                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BSS') {echo " BS";}else{echo " $";} ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>">
                               <div class="card ventacenamiento-card">
@@ -224,17 +224,11 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                                     </li>
                                     <li><?php echo "<a class='dropdown-item' href='ver_compra.php?cod_compra=".$obj->cod_compra."'>Ver</a>"; ?></li>
 
-                                    <?php  if ($obj->estado=='Cerrada') { ?>
-                                      <li><?php //echo "<a class='dropdown-item' href='javascript:abrirVentana('venta_imprimir.php?cod_venta=".$obj->cod_venta."')'>Imprimir</a>"; ?>
-                                        <a class='dropdown-item' href="javascript:abrirVentana('venta_imprimir.php?cod_venta=<?php echo $obj->cod_venta;?>')">Imprimir</a>
-                                      </li>
-                                    <?php } ?>
 
                                     <?php if ($obj->estado=='Cerrada') {
-                                      //href="./controller/Ventas.controller.php?cod_venta=<?php echo $obj->cod_ventaoperacion=anulaVenta" 
                                     ?>
                                     <li>
-                                      <a class='dropdown-item' href="./anular_venta.php?cod_venta=<?php echo $obj->cod_venta;?>">Anular</a>
+                                      <a class='dropdown-item' href="./anular_compra.php?cod_compra=<?php echo $obj->cod_compra;?>">Anular</a>
                                     </li>
                                     <?php } ?>
                                     
@@ -277,8 +271,8 @@ $grupo= $_SESSION['cod_grupo_usuario_log'];
                       <label class="page-link">
                         <?php 
                           if (!empty($objCompras)) {
-                            echo $vent->primero?>
-                            -<?php echo $vent->ultimo?> de <?php echo $vent->total; 
+                            echo $comp->primero?>
+                            -<?php echo $comp->ultimo?> de <?php echo $comp->total; 
                           } 
                         ?>
                       </label>
