@@ -13,10 +13,10 @@
 
 		
 
-		function addProducto($codigo_producto, $nombre_producto, $descripcion, $marca, $existencia, $precio, $cod_foto) {
+		function addProducto($codigo_producto, $nombre_producto, $descripcion, $marca, $existencia, $precio, $cod_foto, $precio_costo) {
 			$err="OK";
 			if (empty($cod_foto)) $cod_foto=0;
-			$query="INSERT INTO tbl_producto (codigo_producto, nombre_producto, descripcion, marca, cantidad, precio, cod_foto, cod_usuario_creo, fecha_registro) values ('$codigo_producto','$nombre_producto', '$descripcion', '$marca','$existencia','$precio', '$cod_foto', '".$_SESSION['cod_usuario_log']."', '".date('Y-m-d')."')";
+			$query="INSERT INTO tbl_producto (codigo_producto, nombre_producto, descripcion, marca, cantidad, precio, cod_foto, precio_costo, cod_usuario_creo, fecha_registro) values ('$codigo_producto','$nombre_producto', '$descripcion', '$marca','$existencia','$precio', '$cod_foto', '$precio_costo', '".$_SESSION['cod_usuario_log']."', '".date('Y-m-d')."')";
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			mysqli_set_charset($con, "utf8");
 			@mysqli_select_db($con,$this->vardb);
@@ -88,6 +88,8 @@
 
 				$this->nombre_creo=$this->mysqli_result($rs,0,'nombre_creo');
 				$this->apellido_creo=$this->mysqli_result($rs,0,'apellido_creo');
+
+				$this->precio_costo=$this->mysqli_result($rs,0,'precio_costo');
 				} else {
 			}
 			if ($rs) {}
@@ -285,9 +287,9 @@
 		}
 
 
-		function modProducto($cod_producto, $codigo_producto, $nombre_producto, $descripcion, $marca, $cod_foto) {
+		function modProducto($cod_producto, $codigo_producto, $nombre_producto, $descripcion, $marca, $cod_foto, $precio_costo) {
 			$err="OK";
-			$query="UPDATE tbl_producto set codigo_producto='$codigo_producto', nombre_producto='$nombre_producto', descripcion='$descripcion', marca='$marca', cod_foto='$cod_foto', cod_foto='$cod_foto'  WHERE cod_producto='$cod_producto'";
+			$query="UPDATE tbl_producto set codigo_producto='$codigo_producto', nombre_producto='$nombre_producto', descripcion='$descripcion', marca='$marca', cod_foto='$cod_foto', precio_costo='$precio_costo'  WHERE cod_producto='$cod_producto'";
 			$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
 			mysqli_set_charset($con, "utf8");
 			@mysqli_select_db($con,$this->vardb);

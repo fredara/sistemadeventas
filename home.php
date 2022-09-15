@@ -157,8 +157,8 @@
                       <h6>Opciones</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Registrar</a></li>
-                    <li><a class="dropdown-item" href="#">Listado</a></li>
+                    <li><a class="dropdown-item" href="registro_compra.php">Registrar</a></li>
+                    <li><a class="dropdown-item" href="listar_compra.php">Listado</a></li>
                   </ul>
                 </div>
 

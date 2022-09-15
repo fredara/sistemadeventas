@@ -116,7 +116,7 @@
                     $ip=$uti->getIP();
                     $log->addLog($_SESSION['cod_usuario_log'], $descripcion, $fecha_hora, $ip, "Ventas");
                     $err="La Venta se ha Creado  de forma exitosa";
-                    header("Location:../listar_ventas.php?err=$err&tp=e");
+                    header("Location:../listar_ventas.php?err=$err&tp=e&cod_venta=$vent->cod_venta");
 
                 }
             }else{

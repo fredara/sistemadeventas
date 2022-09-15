@@ -177,7 +177,7 @@ $alm->getProducto($cod_producto);
                     ?>
                         <tr>
                             <th scope="row"> <?php echo $obj->fecha_reg; ?></th>
-                            <td style="text-align: center;"><?php echo @number_format($obj->precio, 1, ',', '.'); ?></td>
+                            <td style="text-align: center;"><?php echo $obj->precio; ?></td>
                             <td style="text-align: center;"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
                             
                         </tr>

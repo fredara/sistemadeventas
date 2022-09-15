@@ -44,6 +44,23 @@
             return $err;
         }
 
+        function getProveedor_identificacion($num_identificacion, $tipo_identi){
+            $err="OK";
+            $query="SELECT t1.* from tbl_proveedor t1 where t1.tipo_identidad='$tipo_identi' and  t1.num_identificacion='$num_identificacion' ";
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);		
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)>0){
+                $this->nombre_cliente=$this->mysqli_result($rs,0,'nombre_cliente');
+                $this->direccion_cliente=$this->mysqli_result($rs,0,'direccion_cliente');
+            } else {
+            }
+            if ($rs) {}
+            else { $err="X"; }
+            @mysqli_close($con);
+            return $err;
+        }
+
         function getVenta($cod_venta){
             $err="OK";
             $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_ven, t2.num_identificacion, t2.nombre_cliente, t2.direccion_cliente from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) where t1.cod_venta='$cod_venta'";
@@ -128,14 +145,19 @@
 			return $err;
 		}
 
-        function listarProductos($pag, $regxpag){
+        function listarProductos($cod_venta, $pag, $regxpag){
             if (empty($pag)) $pag=1;
             if (empty($regxpag)) $regxpag=15;
             $inic = ($pag * $regxpag) - $regxpag;
             $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
             @mysqli_select_db($con,$this->vardb);	
             mysqli_set_charset($con, "utf8");
-            $query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_usuario, t2.apellido_usuario, t3.nombre_cliente FROM tbl_ventas t1 left join tbl_usuario t2 on (t1.cod_usuario_creo=t2.cod_usuario) left join tbl_cliente t3 on (t1.cod_cliente=t3.cod_cliente)  ORDER BY t1.cod_venta desc LIMIT $inic, $regxpag";
+            if(!empty($cod_venta)){
+                $query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_usuario, t2.apellido_usuario, t3.nombre_cliente FROM tbl_ventas t1 left join tbl_usuario t2 on (t1.cod_usuario_creo=t2.cod_usuario) left join tbl_cliente t3 on (t1.cod_cliente=t3.cod_cliente) WHERE t1.cod_venta = '$cod_venta' ORDER BY t1.cod_venta desc LIMIT $inic, $regxpag";
+            }else{
+                $query="SELECT SQL_CALC_FOUND_ROWS t1.*, date_format(t1.fecha_registro, '%d/%m/%Y') as fecha_1, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_usuario, t2.apellido_usuario, t3.nombre_cliente FROM tbl_ventas t1 left join tbl_usuario t2 on (t1.cod_usuario_creo=t2.cod_usuario) left join tbl_cliente t3 on (t1.cod_cliente=t3.cod_cliente)  ORDER BY t1.cod_venta desc LIMIT $inic, $regxpag";
+            }
+            
             $rs=@mysqli_query($con,$query);
             if (@mysqli_num_rows($rs)){
             $query="SELECT FOUND_ROWS()";

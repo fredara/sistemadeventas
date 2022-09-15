@@ -61,197 +61,181 @@
 <body>
     <section class="section dashboard" style="padding: 15px; font-size: 14px;">
         <div class="row text-center">
-            <label class="col-sm-8 col-form-label">J-123456789</label>
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"><strong>RECARVAL</strong></label>
+        </div>
+        <div class="row text-center">
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;">J-123456789</label>
+        </div>
+        <div class="row text-center">
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"> ------------Datos del Consumidor------------ </label>
         </div>
         <div class="row">
-            <label class="col-sm-8 col-form-label"><strong>Nro Venta:</strong>  <?php echo $cod_venta; ?></label>
-        </div>
-        <div class="row">
-            <label class="col-sm-8 col-form-label"><strong>Fecha de Venta:</strong>  <?php echo $vent->fecha_ven; ?></label>
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"><strong>Fecha de Venta:</strong>  <?php echo $vent->fecha_ven; ?></label>
         </div>
         
         <div class="row">
-            <label class="col-sm-8 col-form-label"><strong>Nombre Cliente:</strong>  <?php echo $vent->nombre_cliente; ?></label>
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"><strong>Nombre Cliente:</strong>  <?php echo $vent->nombre_cliente; ?></label>
         </div>
         <div class="row">
-            <label class="col-sm-8 col-form-label"><strong>Identificaci&oacute;n:</strong>  <?php echo $vent->num_identificacion; ?></label>
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"><strong>Identificaci&oacute;n:</strong>  <?php echo $vent->num_identificacion; ?></label>
         </div>
         <div class="row">
-            <label class="col-sm-8 col-form-label"><strong>Direcci&oacute;n:</strong>  <?php echo $vent->direccion_cliente; ?></label>
+            <label class="col-sm-8 col-form-label" style="padding-top: 1px;"><strong>Direcci&oacute;n:</strong>  <?php echo $vent->direccion_cliente; ?></label>
         </div>
 
-        <div class="row">
+        <!--<div class="row">
             <label class="col-sm-8 col-form-label"><strong>Tasa de Cambio:</strong>  <?php echo @number_format($vent->tasa_cambio, 2, ',', '.'); ?>    <strong>Moneda:</strong>  <?php echo $vent->moneda; ?></label>
-        </div>
+        </div>-->
 
-        <div class="row">
-            <label class="col-sm-8 col-form-label"><span class="badge bg-info text-dark"><strong>Observaci&oacute;n:</strong><?php echo $vent->observacion; ?></span></label>
-        </div>
-
-        <div class="row mb-4">
-          <?php if ($vent->estado=='Cerrada') {$class = 'badge rounded-pill bg-success';}else{$class = 'badge rounded-pill bg-danger';} ?>
-            <label class="col-sm-8 col-form-label"><span class="<?php echo $class; ?>"><strong>Estado: </strong><?php echo $vent->estado; ?></span></label>
+        <div class="row text-center" style="font-size: 18px;">
+            <label class="col-sm-8 col-form-label"><strong>Factura</strong></label>
         </div>
 
         <div class="row">
             <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                    <p></p>
-                    <!-- Bordered Table -->
-                    <div class="table-responsive">
-                    <table class="table table-bordered table-responsive">
-                        <thead>
-                        <tr>
-                            <th scope="col" style="text-align: center;"><strong>CANT</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>DESC</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>PxU</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>IVA</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>TOT</strong></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $i=0;
-                            $listaDetalle = $vent->detalleVenta($cod_venta);
-                            if (!empty($listaDetalle)) {
-                                foreach ($listaDetalle as $obj) {
-                                    $i=$i+1;
-                                    $cantidad_precio = $obj->cantidad * $obj->precioxuni;
+                <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" style="padding: 4px;">
+                    <tr>
+                        <td colspan="4"><hr style="border: 1px dashed; margin: 0rem 0;"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>CANT</strong></td>
+                        <td><strong>DESCRIP</strong></td>
+                        <td><strong>P/UNI</strong></td>
+                        <td><strong>Valor</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><hr style="border: 1px dashed; margin: 0rem 0;"></td>
+                    </tr>
+                    <?php 
+                        $i=0;
+                        $listaDetalle = $vent->detalleVenta($cod_venta);
+                        if (!empty($listaDetalle)) {
+                            foreach ($listaDetalle as $obj) {
+                                $i=$i+1;
+                                $cantidad_precio = $obj->cantidad * $obj->precioxuni;
 
-                                    if ($obj->porcentaje_iva==16) {
-                                        $subtotal=$subtotal+$cantidad_precio;
-                                    } elseif ($obj->porcentaje_iva == 10) {
-                                        $subtotal_r=$subtotal_r+$cantidad_precio;
-                                    } else {
-                                        $exento=$exento+$cantidad_precio;
-                                    }
-                            ?>
-                                    <tr>
-                                        <th scope="row" style="text-align: center;"><?php echo $i; ?></th>
-                                        <td style="text-align: center;"><?php echo $obj->nombre_producto; ?></td>
-                                        <td style="text-align: center;"><?php echo $obj->precioxuni;?></td>
-                                        <td style="text-align: center;"><?php if ($obj->porcentaje_iva=='') {echo " N/A";}else{echo " ".$obj->porcentaje_iva."%";}  ?></td>
-                                        <td style="text-align: right;"><?php echo @number_format($cantidad_precio, 2, ',', '.');  ?></td>
-                                    </tr>
-                            <?php 
-                                    $iva=($subtotal*16)/100;
-                                    $total=$subtotal+$subtotal_r+$exento+$iva;
+                                if ($obj->porcentaje_iva==16) {
+                                    $subtotal=$subtotal+$cantidad_precio;
+                                } elseif ($obj->porcentaje_iva == 10) {
+                                    $subtotal_r=$subtotal_r+$cantidad_precio;
+                                } else {
+                                    $exento=$exento+$cantidad_precio;
                                 }
+                    ?>          <tr>
+                                    <td><?php echo $obj->cantidad; ?></td>
+                                    <td><?php echo $obj->nombre_producto; ?></td>
+                                    <td><?php echo @number_format($obj->precioxuni, 2, ',', '.');?></td>
+                                    <td><?php echo @number_format($cantidad_precio, 2, ',', '.');?></td>
+                                </tr>
+                    <?php 
+                                $iva=($subtotal*16)/100;
+                                $total=$subtotal+$subtotal_r+$exento+$iva;
+                                $total_neto = $subtotal+$subtotal_r+$exento;
                             }
-                            ?>
+                        }
+                    ?>
+                    <tr>
+                        <td colspan="4"><hr style="border: 1px dashed; margin: 0rem 0;"></td>
+                    </tr>
 
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>Base Imponible</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($subtotal, 2, ',', '.');?></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>Exento</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($exento, 2, ',', '.');?></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>IVA</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($iva, 2, ',', '.');?></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>TOTAL</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($total, 2, ',', '.');?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                    </div>
-                </div>
-
-
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Forma de Pago</h5>
-                    <p></p>
-                    <!-- Bordered Table -->
-                    <table class="table table-bordered table-striped table-condensed">
-                        <thead>
-                        <tr>
-                            <th scope="col" style="text-align: center;"><strong>INSTRUMENTO</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>BANCO</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>NUMERO</strong></th>
-                            <th scope="col" style="text-align: center;"><strong>MONTO</strong></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $total_pagado_bs = 0;
-                            $total_pagado_usd = 0;
+                    <tr>
+                        <td colspan="3" align="left">Total Neto</td>
+                        <td align="rigth"><?php echo @number_format($total_neto, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">Base Gravable</td>
+                        <td align="rigth"><?php echo @number_format($subtotal, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">IVA 16,00%</td>
+                        <td align="rigth"><?php echo @number_format($iva, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">Exento</td>
+                        <td align="rigth"><?php echo @number_format($exento, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">TOTAL</td>
+                        <td align="rigth"><?php echo @number_format($total, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><hr style="border: 1px dashed; margin: 0rem 0;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" align="left">FORMA DE PAGO</td>
+                        <?php 
+                            $efectivo = 0;
+                            $debito = 0;
+                            $trans_pagom = 0;
+                            $divisa = 0;
                             $pagosRealizados = $vent->detallePAGO($cod_venta);
                             if (!empty($pagosRealizados)) {
                                 foreach ($pagosRealizados as $pag) {
-                            ?>
-                                    <tr>
-                                        <td style="text-align: center;"><?php echo $pag->instru; ?></td>
-                                        <td style="text-align: center;"><?php echo $pag->nombre_banco;?></td>
-                                        <td style="text-align: center;"><?php echo $pag->numero;?></td>
-                                        <td style="text-align: right;"><?php echo @number_format($pag->monto, 2, ',', '.'); echo " ".$pag->moneda_pago; ?></td>
-                                    </tr>
-                            <?php
                                     if ($pag->moneda_pago=='BS') {
-                                        $total_pagado_bs += $pag->monto;
+                                        if($pag->instru=='Efectivo'){
+                                            $efectivo += $pag->monto;
+                                        }elseif ($pag->instru=='Tarjeta de Debito') {
+                                            $debito += $pag->monto;
+                                        }elseif($pag->instru=='Transferencia' || $pag->instru=='Pago Movil'){
+                                            $trans_pagom += $pag->monto;
+                                        }
                                     }else{
-                                        $total_pagado_usd += $pag->monto;
+                                        $divisa += $pag->monto;
                                     }
+                                    
                                 
                                 }
                             }
                             ?>
+                    </tr>
 
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
 
-                           
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>TOTAL BS</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($total_pagado_bs, 2, ',', '.');?></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td style="text-align: right;"><strong>TOTAL USD</strong></td>
-                                <td style="text-align: right;"><?php echo @number_format($total_pagado_usd, 2, ',', '.');?></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
+                    <tr>
+                        <td colspan="3" align="left">EFECTIBO (Bs):</td>
+                        <td align="rigth"><?php echo @number_format($efectivo, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">DIVISA ($):</td>
+                        <td align="rigth"><?php echo @number_format($divisa, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">TARJETA DEBITO (Bs):</td>
+                        <td align="rigth"><?php echo @number_format($debito, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" align="left">Pago Movil o Transferencia (Bs):</td>
+                        <td align="rigth"><?php echo @number_format($trans_pagom, 2, ',', '.');?></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><hr style="border: 1px dashed; margin: 0rem 0;"></td>
+                    </tr>
+
+                    <tr>
+                        <td><?php echo $cod_venta; ?></td>
+                        <td></td>
+                        <td>CAJA 1</td>
+                    </tr>
+
+                    
+                    <tr>
+                        <td colspan="4" align="center">
+                            <br>
+                            <a href="javascript:window.print()" id="imprimir">[ Imprimir ]</a>
+                            <a href="#" onclick="window.close();" id="imprimir">[ Cerrar ]</a>
+                        </td>
+                    </tr>
+
+
+
+                </table>
             </div>
         </div>
+
+
+
+
     </section>
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>

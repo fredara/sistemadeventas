@@ -168,7 +168,7 @@
         <div class="row mb-3">
             <label for="precio" class="col-sm-2 col-form-label">Precio ($) <span class="badge border-danger border-1 text-danger">*</span></label>
             <div class="col-sm-6">
-            <input type="number" class="form-control" name="precio" id="precio" required value="<?php echo $alm->precio; ?>">
+            <input type="text" class="form-control" name="precio" id="precio" required value="<?php echo $alm->precio; ?>" alt="Costo">
             </div>
         </div>
 

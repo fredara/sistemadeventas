@@ -27,7 +27,7 @@
                     header("Location:../registrar_producto.php?err=$err");
                     break;
                 }else{
-                    $error=$alm->addProducto($codigo_producto, $nombre_producto, $descripcion, $marca, $cantidad_inicial, $precio, $cod_foto);
+                    $error=$alm->addProducto($codigo_producto, $nombre_producto, $descripcion, $marca, $cantidad_inicial, $precio, $cod_foto, $precio_costo);
 
                     if ($error!='OK') {
                         $err="Hubo problemas para conectarse con la base de Datos, por favor contacte al administrador del sistema";
@@ -133,7 +133,7 @@
                 }
                 //Fin del Guardar Foto
                 
-                $error2=$alm->modProducto($cod_producto, $codigo_producto, $nombre_producto, $descripcion, $marca, $cod_foto);
+                $error2=$alm->modProducto($cod_producto, $codigo_producto, $nombre_producto, $descripcion, $marca, $cod_foto, $precio_costo);
                 if ($error2!='OK') {
                     $err="No se pudo guardar la información del producto, por favor contacte al administrador del sistema";
                     header("Location:../lista_productos.php?err=$err&pag=$pag");

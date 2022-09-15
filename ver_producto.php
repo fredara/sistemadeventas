@@ -6,6 +6,8 @@
   $alm = new Almacen();
   $alm->getProducto($cod_producto);
   $arch = new Archivo();	
+
+  $grupo= $_SESSION['cod_grupo_usuario_log'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -205,8 +207,15 @@
         </div>
 
         <div class="row mb-3">
-            <label for="precio" class="col-sm-8 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">(Se Cambia por Precios)</span>  <strong><?php echo @number_format($alm->precio, 1, ',', '.'); echo " $"; ?></strong></label>
+            <label for="precio" class="col-sm-8 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">(Se Cambia por Precios)</span>  <strong><?php echo @number_format($alm->precio, 2, ',', '.'); echo " $"; ?></strong></label>
         </div>
+        
+        <?php if($grupo==1){ ?>
+          <div class="row mb-3">
+              <label for="precio" class="col-sm-8 col-form-label">Precio al Costo ($)  <strong><?php echo @number_format($alm->precio_costo, 2, ',', '.'); echo " $"; ?></strong></label>
+          </div>
+        <?php } ?>
+
 
         <div class="row mb-3">
             <label for="precio" class="col-sm-8 col-form-label">Registrado Por: <strong><?php echo $alm->nombre_creo; echo " "; echo $alm->apellido_creo; ?></strong></label>

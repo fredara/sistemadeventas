@@ -7,6 +7,8 @@
 
   require_once("./clases/archivo.php");
   $arch = new Archivo();	
+
+  $grupo= $_SESSION['cod_grupo_usuario_log'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -243,6 +245,14 @@
               <?php } }?>
             </label>
         </div>
+        <?php if($grupo==1){ ?>
+          <div class="row mb-3">
+              <label for="precio" class="col-sm-2 col-form-label">Precio al Costo ($)</label>
+              <div class="col-sm-6">
+              <input type="text" class="form-control" name="precio_costo" id="precio_costo" alt="Costo" value="<?php echo $alm->precio_costo; ?>" >
+              </div>
+          </div>
+        <?php }?>
 
         <div class="row mb-3">
             <label for="cantidad_inicial" class="col-sm-8 col-form-label">Existencia <span class="badge border-danger border-1 text-danger">(Solo por Ajustes)</span> <strong><?php echo $alm->existencia; ?></strong></label>

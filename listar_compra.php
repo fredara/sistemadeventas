@@ -1,17 +1,14 @@
 <?php
 extract($_REQUEST);
 require_once("./inc/sesion.php");
-require_once("./clases/ventas.php");
+require_once("./clases/compra.php");
 if (empty($regxpag))  $regxpag=30;
 if (empty($pag)) $pag=1;
-$vent = new Ventas();
-$objVentas= $vent->listarProductos($numero_venta, $pag, $regxpag);
+$comp = new Compra();
+$objCompras= $comp->listaCompras($numero_compra, $pag, $regxpag);
 $total_paginas=ceil($vent->total/$regxpag);
 
 $grupo= $_SESSION['cod_grupo_usuario_log'];
-if(empty($cod_venta)){
-  $cod_venta = 0;
-}
 ?>
 <!DOCTYPE html PUBLIC>
 <html lang="en">
@@ -54,11 +51,6 @@ if(empty($cod_venta)){
   <link href="assets/css/style.css" rel="stylesheet">
   <script type="text/javascript">
     $(document).ready(function() {
-      var cod_venta = <?php echo $cod_venta; ?>
-
-      if (cod_venta!='') {
-        abrirVentana(`venta_imprimir.php?cod_venta=${cod_venta}`);
-      }
 
     });
 
@@ -75,9 +67,9 @@ if(empty($cod_venta)){
 
     function cambiaBuscar(val){
       if (val=='Numero') {
-        document.getElementById('numero_venta').style.display = 'inline';
+        document.getElementById('numero_compra').style.display = 'inline';
       }else{
-        document.getElementById('numero_venta').style.display = 'none';
+        document.getElementById('numero_compra').style.display = 'none';
       }
 
     }
@@ -158,10 +150,10 @@ if(empty($cod_venta)){
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="home.php">Home</a></li>
-          <li class="breadcrumb-item active"><a href="listar_ventas.php">Lista de Ventas</a></li>
+          <li class="breadcrumb-item active"><a href="listar_compra.php">Lista de Compras</a></li>
         </ol>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><a href="registro_ventas.php">Registrar Venta</a></li>
+          <li class="breadcrumb-item active"><a href="registro_compra.php">Registrar Compra</a></li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -169,15 +161,15 @@ if(empty($cod_venta)){
     <div class="container breadcrumb">
       <div class="row mb-12">
         <div class="col-lg-12">
-          <form action="listar_ventas.php" method="post"> 
+          <form action="listar_compra.php" method="post"> 
             <label class="breadcrumb-item active">Buscar por:</label>
 
             <select class="form-select" name="buscar_por" id="buscar_por" onchange="cambiaBuscar(this.value);" style="display: inline !important; width: auto !important;">
               <option value="Seleccione">Seleccione</option>
-              <option value="Numero">N&uacute;mero</option>
+              <option value="Numero">N&uacute;mero de Compra</option>
             </select>
 
-            <input class="form-control" type="text" name="numero_venta" id="numero_venta" style="display: none; width: auto !important;">
+            <input class="form-control" type="text" name="numero_compra" id="numero_compra" style="display: none; width: auto !important;">
 
 
             <button type="submit" class="btn btn-primary" id="btn_buscar">Buscar</button>
@@ -196,8 +188,8 @@ if(empty($cod_venta)){
                     <table class="table table-striped">
                     <thead>
                         <tr>
-                        <th style="width: 5%; text-align: center;">Nro Venta</th>
-                        <th style="width: 20%; text-align: center;">Cliente</th>
+                        <th style="width: 5%; text-align: center;">Nro Compra</th>
+                        <th style="width: 20%; text-align: center;">Proveedor</th>
                         <th style="width: 20%; text-align: center;">Fecha</th>
                         <th style="width: 5%; text-align: center;">Estatus</th>
                         <th style="width: 15%; text-align: center;">Total</th>
@@ -207,8 +199,8 @@ if(empty($cod_venta)){
                     </thead>
                     <tbody>
                     <?php 
-                        if(!empty($objVentas)) {
-				                  foreach ($objVentas as $obj) {
+                        if(!empty($objCompras)) {
+				                  foreach ($objCompras as $obj) {
                             if ($obj->estado=='Cerrada') {
                               $class = 'table-success';
                             }else{
@@ -216,9 +208,9 @@ if(empty($cod_venta)){
                             }
                     ?>
                         <tr>
-                            <th scope="row" style="text-align: center;" class="<?php echo $class; ?>"> <?php echo $obj->cod_venta; ?></th>
-                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_cliente; ?></td>
-                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->fecha_vent; ?></td>
+                            <th scope="row" style="text-align: center;" class="<?php echo $class; ?>"> <?php echo $obj->cod_compra; ?></th>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_proveedor; ?></td>
+                            <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->fecha_comp; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->estado; ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo @number_format($obj->total, 2, ',', '.'); if ($obj->moneda == 'BS') {echo " BS";}else{echo " $";} ?></td>
                             <td style="text-align: center;" class="<?php echo $class; ?>"><?php echo $obj->nombre_usuario; echo " "; echo $obj->apellido_usuario; ?></td>
@@ -230,7 +222,7 @@ if(empty($cod_venta)){
                                     <li class="dropdown-header text-start">
                                       <h6>Opciones</h6>
                                     </li>
-                                    <li><?php echo "<a class='dropdown-item' href='ver_venta.php?cod_venta=".$obj->cod_venta."'>Ver</a>"; ?></li>
+                                    <li><?php echo "<a class='dropdown-item' href='ver_compra.php?cod_compra=".$obj->cod_compra."'>Ver</a>"; ?></li>
 
                                     <?php  if ($obj->estado=='Cerrada') { ?>
                                       <li><?php //echo "<a class='dropdown-item' href='javascript:abrirVentana('venta_imprimir.php?cod_venta=".$obj->cod_venta."')'>Imprimir</a>"; ?>
@@ -284,7 +276,7 @@ if(empty($cod_venta)){
                     <span class="d-flex align-items-center justify-content-center pagination">
                       <label class="page-link">
                         <?php 
-                          if (!empty($objVentas)) {
+                          if (!empty($objCompras)) {
                             echo $vent->primero?>
                             -<?php echo $vent->ultimo?> de <?php echo $vent->total; 
                           } 

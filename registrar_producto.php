@@ -1,6 +1,7 @@
 <?php
   extract($_REQUEST);
   require_once("./inc/sesion.php");
+  
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -223,9 +224,16 @@
         </div>
 
         <div class="row mb-3">
-            <label for="precio" class="col-sm-2 col-form-label">P. V. P ($) <span class="badge border-danger border-1 text-danger">*</span></label>
+            <label for="precio" class="col-sm-2 col-form-label">Precio al Costo ($)</label>
             <div class="col-sm-6">
-            <input type="number" class="form-control" name="precio" id="precio" required>
+            <input type="text" class="form-control" name="precio_costo" id="precio_costo" alt="Costo">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="precio" class="col-sm-2 col-form-label">Precio Venta ($) <span class="badge border-danger border-1 text-danger">*</span></label>
+            <div class="col-sm-6">
+            <input type="text" class="form-control" name="precio" id="precio" alt="Costo" required>
             </div>
         </div>
 
