@@ -1290,6 +1290,13 @@ h6 {
   color: #ed3c0d !important;
 }
 
+.borde_gris_bottom {
+	border-bottom:1px solid #CCCCCC;
+	padding:3px;
+	font-size:11px;
+	text-transform:uppercase;
+}
+
 @media only screen and (max-width: 800px) {
 	#unseen table td:nth-child(2), 
 	#unseen table th:nth-child(2) {display: none;}

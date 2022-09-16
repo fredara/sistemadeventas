@@ -145,6 +145,40 @@
 			return $err;
 		}
 
+        function ReporteVentas($desde, $hasta, $estado){
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);	
+            
+            if (!empty($desde) and !empty($hasta) and !empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta>='$desde' and t1.fecha_venta<='$hasta' and t1.estado='$estado' order by t1.fecha_venta asc";
+            }elseif (empty($desde) and !empty($hasta) and !empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta<='$hasta' and t1.estado='$estado' order by t1.fecha_venta asc";
+            }elseif (!empty($desde) and empty($hasta) and !empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta>='$desde' and t1.estado='$estado' order by t1.fecha_venta asc";
+            }elseif (!empty($desde) and !empty($hasta) and empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta>='$desde' and t1.fecha_venta<='$hasta' order by t1.fecha_venta asc";
+            }elseif (empty($desde) and empty($hasta) and !empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.estado='$estado' order by t1.fecha_venta asc";
+            }elseif (!empty($desde) and empty($hasta) and empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta>='$desde' order by t1.fecha_venta asc";
+            }elseif (empty($desde) and !empty($hasta) and empty($estado)) {
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_venta<='$hasta' order by t1.fecha_venta asc";
+            }else{
+                $query="SELECT t1.*, date_format(t1.fecha_venta, '%d/%m/%Y') as fecha_vent, t2.nombre_cliente, t3.nombre_usuario, t3.apellido_usuario from tbl_ventas t1 left join tbl_cliente t2 on (t1.cod_cliente=t2.cod_cliente) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) order by t1.fecha_venta asc";
+            }
+
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)){ 
+                while($obj = @mysqli_fetch_object($rs)) {
+                       $return[] = $obj;
+                }
+            }
+            @mysqli_close($con);
+            return $return;
+        }
+
+        
+
         function listarProductos($cod_venta, $pag, $regxpag){
             if (empty($pag)) $pag=1;
             if (empty($regxpag)) $regxpag=15;

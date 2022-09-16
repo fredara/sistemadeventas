@@ -210,6 +210,37 @@
         return $return;
     }
 
+	function ReporteCompras($desde, $hasta, $estado){
+		$con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+		@mysqli_select_db($con,$this->vardb);	
+		
+		if (!empty($desde) and !empty($hasta) and !empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra>='$desde' and t1.fecha_compra<='$hasta' and t1.estado='$estado' order by t1.fecha_compra asc";
+		}elseif (empty($desde) and !empty($hasta) and !empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra<='$hasta' and t1.estado='$estado' order by t1.fecha_compra asc";
+		}elseif (!empty($desde) and empty($hasta) and !empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra>='$desde' and t1.estado='$estado' order by t1.fecha_compra asc";
+		}elseif (!empty($desde) and !empty($hasta) and empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra>='$desde' and t1.fecha_compra<='$hasta' order by t1.fecha_compra asc";
+		}elseif (empty($desde) and empty($hasta) and !empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.estado='$estado' order by t1.fecha_compra asc";
+		}elseif (!empty($desde) and empty($hasta) and empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra>='$desde' order by t1.fecha_compra asc";
+		}elseif (empty($desde) and !empty($hasta) and empty($estado)) {
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) where t1.fecha_compra<='$hasta' order by t1.fecha_compra asc";
+		}else{
+			$query="SELECT t1.*, date_format(t1.fecha_compra, '%d/%m/%Y') as fecha_comp, t2.nombre_proveedor, t3.nombre_usuario, t3.apellido_usuario from tbl_compra t1 left join tbl_proveedor t2 on (t1.cod_proveedor=t2.cod_proveedor) left join tbl_usuario t3 on (t1.cod_usuario_creo=t3.cod_usuario) order by t1.fecha_compra asc";
+		}
+		$rs=@mysqli_query($con,$query);
+		if (@mysqli_num_rows($rs)){ 
+			while($obj = @mysqli_fetch_object($rs)) {
+				   $return[] = $obj;
+			}
+		}
+		@mysqli_close($con);
+		return $return;
+	}
+
 		
 
 

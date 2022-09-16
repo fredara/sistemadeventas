@@ -324,6 +324,26 @@
 			return $err;
 		}
 
+		function ReporteVentas($tipo_reporte){
+            $con=@mysqli_connect($this->varhost,$this->varlogin,$this->varpass,$this->vardb);
+            @mysqli_select_db($con,$this->vardb);	
+            
+           	if ($tipo_reporte == 'Falla') {
+				$query="SELECT t1.* from tbl_producto t1 where t1.cantidad<=0  order by t1.nombre_producto asc";
+			}else{
+				$query="SELECT t1.* from tbl_producto t1  order by t1.nombre_producto asc";
+			}
+
+            $rs=@mysqli_query($con,$query);
+            if (@mysqli_num_rows($rs)){ 
+                while($obj = @mysqli_fetch_object($rs)) {
+                       $return[] = $obj;
+                }
+            }
+            @mysqli_close($con);
+            return $return;
+        }
+
 		function FechaOriginal($fecha) {
 			$mifecha = explode("/",$fecha);
 			$lafecha = $mifecha[2]."-".$mifecha[1]."-".$mifecha[0];

@@ -162,7 +162,7 @@
                   </ul>
                 </div>
 
-                <div class="card-body">
+                <a class="dropdown-item d-flex align-items-center" data-bs-toggle="dropdown" href="#"><div class="card-body">
                   <h5 class="card-title"><!--<span>| This Month</span>--></h5>
 
                   <div class="d-flex align-items-center">
@@ -175,7 +175,7 @@
 
                     </div>
                   </div>
-                </div>
+                </div></a>
 
               </div>
             </div><!-- End Revenue Card -->
@@ -227,13 +227,13 @@
                       <h6>Reporte Por:</h6>
                     </li>
 
-                    <li><a class="dropdown-item" href="#">Ventas</a></li>
-                    <li><a class="dropdown-item" href="#">Compras</a></li>
-                    <li><a class="dropdown-item" href="#">Almac&eacute;n</a></li>
+                    <li><a class="dropdown-item" href="reporte_ventas.php">Ventas</a></li>
+                    <li><a class="dropdown-item" href="reporte_compras.php">Compras</a></li>
+                    <li><a class="dropdown-item" href="reporte_almacen.php">Almac&eacute;n</a></li>
                   </ul>
                 </div>
 
-                <div class="card-body">
+                <a class="dropdown-item d-flex align-items-center" data-bs-toggle="dropdown" href="#"><div class="card-body">
                   <h5 class="card-title">Reportes </h5>
 
                   <div class="d-flex align-items-center">
@@ -246,8 +246,8 @@
 
                     </div>
                   </div>
-
                 </div>
+                </a>
               </div>
 
               </div>
